@@ -1,0 +1,35 @@
+{
+  "v0": {
+    "base_top3": 0.8831168831168831,
+    "sin cara (nariz, ojos, boca)": 0.5211038961038961,
+    "sin hombros y codos": 0.7662337662337663,
+    "sin muñecas (pose)": 0.7694805194805194,
+    "sin mano izquierda": 0.599025974025974,
+    "sin mano derecha": 0.31006493506493504,
+    "espejo (zurdo)": 0.8165584415584416,
+    "ruido σ=0.05": 0.8831168831168831,
+    "seña cortada (80 %)": 0.8928571428571429
+  },
+  "v1": {
+    "base_top3": 0.9626623376623377,
+    "sin cara (nariz, ojos, boca)": 0.573051948051948,
+    "sin hombros y codos": 0.7386363636363636,
+    "sin muñecas (pose)": 0.6071428571428571,
+    "sin mano izquierda": 0.6136363636363636,
+    "sin mano derecha": 0.47564935064935066,
+    "espejo (zurdo)": 0.9626623376623377,
+    "ruido σ=0.05": 0.9642857142857143,
+    "seña cortada (80 %)": 0.9659090909090909
+  },
+  "v2": {
+    "base_top3": 0.913961038961039,
+    "sin cara (nariz, ojos, boca)": 0.637987012987013,
+    "sin hombros y codos": 0.8571428571428571,
+    "sin muñecas (pose)": 0.8295454545454546,
+    "sin mano izquierda": 0.5551948051948052,
+    "sin mano derecha": 0.39935064935064934,
+    "espejo (zurdo)": 0.9237012987012987,
+    "ruido σ=0.05": 0.9155844155844156,
+    "seña cortada (80 %)": 0.9188311688311688
+  }
+}

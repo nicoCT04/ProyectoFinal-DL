@@ -1,0 +1,54 @@
+{
+  "iteracion": "lc_tf_f50",
+  "seed": 0,
+  "config": {
+    "grupo": "objetivo",
+    "arq": "transformer",
+    "kw": {},
+    "aug": true,
+    "epochs": 250,
+    "lr": 0.0005,
+    "wd": 0.05,
+    "ls": 0.1,
+    "bs": 64,
+    "warmup": 5,
+    "init": null,
+    "congelar": false,
+    "lr_backbone": null,
+    "paciencia": 80,
+    "frac": 0.5
+  },
+  "n_clases": 50,
+  "n_train": 244,
+  "n_val": 190,
+  "n_test": 616,
+  "mejor_epoch": 118,
+  "epochs_corridos": 198,
+  "tiempo_train_s": 57.55215525627136,
+  "dispositivo": "mps",
+  "params": 1833650,
+  "params_entrenables": 1833650,
+  "latencia_cpu_ms": 0.9838539990596473,
+  "train": {
+    "loss": 0.08167748153209686,
+    "top1": 0.9877049326896667,
+    "top3": 1.0,
+    "top5": 1.0,
+    "f1_macro": 0.9876479076479078
+  },
+  "val": {
+    "loss": 0.8292319178581238,
+    "top1": 0.800000011920929,
+    "top3": 0.9368420839309692,
+    "top5": 0.9473684430122375,
+    "f1_macro": 0.7841403041403041
+  },
+  "test": {
+    "loss": 1.019525408744812,
+    "top1": 0.7288960814476013,
+    "top3": 0.899350643157959,
+    "top5": 0.9350649118423462,
+    "f1_macro": 0.7235185676537093
+  },
+  "latencia_cpu_p95_ms": 1.0086847527418286
+}
