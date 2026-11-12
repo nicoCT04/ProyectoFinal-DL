@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeñaBusca — diccionario inverso de ASL</title>
+  <link rel="stylesheet" href="/static/style.css?v=8">
+</head>
+<body>
+<header>
+  <div class="marca">
+    <h1>SeñaBusca</h1>
+    <p>Diccionario inverso de lengua de señas americana (ASL): haz la seña, te digo qué significa.</p>
+  </div>
+  <div class="controles">
+    <label>Modelo
+      <select id="modelo"></select>
+    </label>
+    <label class="interruptor"><input type="checkbox" id="envivo"> En vivo (experimental)</label>
+  </div>
+</header>
+
+<main>
+  <section class="camara">
+    <div class="video-wrap">
+      <video id="video" playsinline muted></video>
+      <canvas id="overlay"></canvas>
+      <div id="estado" class="estado espera">Cargando detector…</div>
+      <div id="vivo" class="vivo oculto"></div>
+    </div>
+    <div class="ayuda">
+      <b>Cómo usarlo:</b> colócate de frente, con hombros visibles. Empieza con las manos
+      <b>abajo</b>, por debajo de la <b>línea amarilla</b>; haz la seña y vuelve a bajarlas. La
+      grabación empieza y termina sola (mano en verde = cuenta como seña, en gris = en reposo).
+    </div>
+    <div class="botones">
+      <button id="btnCamara" class="primario">Encender cámara</button>
+      <button id="btnGrabar" disabled>Grabar 4 s manualmente</button>
+      <label class="boton-archivo">Subir video<input type="file" id="archivo" accept="video/*"></label>
+    </div>
+    <div id="metricas" class="metricas"></div>
+  </section>
+
+  <section class="resultados">
+    <div id="vacio" class="vacio">
+      <p>Aquí aparecerán las coincidencias más probables.</p>
+      <details>
+        <summary>Ver las 50 señas que conoce el prototipo</summary>
+        <div id="vocab" class="vocab"></div>
+      </details>
+    </div>
+    <div id="resultado" class="oculto">
+      <div id="banner" class="banner"></div>
+      <div id="tarjetas" class="tarjetas"></div>
+      <div class="acciones">
+        <button id="btnMas">Ver 10 opciones</button>
+        <button id="btnNinguna">Ninguna es</button>
+      </div>
+      <div id="gracias" class="gracias oculto">¡Gracias! Registrado para mejorar el modelo.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Prototipo académico · CC3092 Deep Learning y Sistemas Inteligentes · UVG ·
+  Entrenado con ASL Citizen (Microsoft Research, uso no comercial). No sustituye a un intérprete.
+</footer>
+
+<script type="module" src="/static/app.js?v=8"></script>
+</body>
+</html>

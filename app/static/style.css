@@ -1,0 +1,68 @@
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --texto: #1d1d1f; --suave: #6b6b70; --borde: #e3e1da;
+  --acento: #2f5bd3; --acento-suave: #e6ecfb; --ok: #1f8a4c; --ok-suave: #e3f4ea;
+  --alerta: #b4690e; --alerta-suave: #fbf0e0; --rojo: #c0392b;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151517; --panel: #1f1f22; --texto: #ececee; --suave: #a0a0a8; --borde: #34343a;
+          --acento: #7b9cff; --acento-suave: #26304a; --ok: #5fcf8e; --ok-suave: #1d3328;
+          --alerta: #f0b25c; --alerta-suave: #3a2d1b; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+       background: var(--bg); color: var(--texto); }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+         gap: 12px; padding: 20px 24px 12px; }
+h1 { margin: 0; font-size: 26px; letter-spacing: -0.5px; }
+header p { margin: 4px 0 0; color: var(--suave); }
+.controles { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+select { margin-left: 6px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--borde);
+         background: var(--panel); color: var(--texto); }
+main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px;
+       padding: 8px 24px 24px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 8px 16px 16px; } }
+section { background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 16px; }
+.video-wrap { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #000; border-radius: 10px;
+              overflow: hidden; }
+video, #overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+                  transform: scaleX(-1); }
+.estado { position: absolute; left: 12px; top: 12px; padding: 6px 12px; border-radius: 999px;
+          font-size: 14px; font-weight: 600; background: rgba(0,0,0,.6); color: #fff; }
+.estado.grabando { background: #c0392b; }
+.estado.grabando::before { content: "● "; }
+.estado.procesando { background: #2f5bd3; }
+.estado.listo { background: #1f8a4c; }
+.vivo { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 10px;
+        background: rgba(0,0,0,.6); color: #fff; font-size: 15px; }
+.ayuda { margin: 12px 0; font-size: 14px; color: var(--suave); line-height: 1.45; }
+.botones { display: flex; gap: 8px; flex-wrap: wrap; }
+button, .boton-archivo { font: inherit; font-size: 14px; padding: 9px 14px; border-radius: 10px;
+         border: 1px solid var(--borde); background: var(--panel); color: var(--texto); cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+button.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+.boton-archivo input { display: none; }
+.metricas { margin-top: 10px; font-size: 12px; color: var(--suave); font-variant-numeric: tabular-nums; }
+.vacio { color: var(--suave); }
+.vocab { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.vocab span { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--acento-suave); }
+.banner { padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 15px; }
+.banner.seguro { background: var(--ok-suave); color: var(--ok); }
+.banner.no_seguro { background: var(--alerta-suave); color: var(--alerta); }
+.tarjetas { display: grid; gap: 10px; }
+.tarjeta { display: flex; gap: 12px; align-items: center;
+           padding: 10px; border: 1px solid var(--borde); border-radius: 12px; }
+.tarjeta > div { flex: 1; min-width: 0; }
+.tarjeta > button { flex: none; }
+.tarjeta.top { border-color: var(--acento); }
+.tarjeta canvas { flex: none; width: 96px; height: 72px; background: var(--bg); border-radius: 8px; cursor: pointer; }
+.tarjeta .es { font-size: 20px; font-weight: 650; }
+.tarjeta .glosa { font-size: 12px; color: var(--suave); letter-spacing: .5px; }
+.barra { height: 6px; border-radius: 3px; background: var(--borde); margin-top: 6px; overflow: hidden; }
+.barra > div { height: 100%; background: var(--acento); }
+.prob { font-size: 12px; color: var(--suave); margin-top: 3px; }
+.tarjeta.mini { padding: 6px 10px; }
+.tarjeta.mini .es { font-size: 15px; }
+.acciones { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.gracias { margin-top: 10px; color: var(--ok); font-size: 14px; }
+.oculto { display: none !important; }
+footer { padding: 0 24px 24px; font-size: 12px; color: var(--suave); }
