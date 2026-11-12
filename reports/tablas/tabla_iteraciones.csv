@@ -1,0 +1,10 @@
+Iteración,Cambio,Semillas,Parámetros,Top-1 train,Top-1 val,Top-1 test,Top-3 test,F1 macro test,Umbral (val),Valor neto USD/mes (test),Búsquedas resueltas,"Entrenamiento (min, M4 Pro)",Latencia CPU (ms)
+clasico_logreg,Regresión logística sobre estadísticos (sin DL),1,,1.000,0.695,0.617,0.799,0.618,0.76,"5,607",0.894,0.0,0.1
+clasico_knn,k-NN sobre estadísticos (sin DL),1,,1.000,0.521,0.451,0.687,0.444,0.82,"4,431",0.857,0.0,1.5
+it0_lstm_base,"LSTM bidireccional, sin aumentos",3,1531442.0,0.999 ± 0.001,0.798 ± 0.006,0.689 ± 0.030,0.870 ± 0.013,0.682 ± 0.033,0.99 ± 0.01,"6,223 ± 52",0.920 ± 0.003,0.6,2.4
+it1_lstm_aug,"+ aumentos (espejo, afín, tiempo) y label smoothing",3,1531442.0,1.000,0.863 ± 0.021,0.813 ± 0.003,0.932 ± 0.008,0.810 ± 0.004,0.65 ± 0.07,"6,365 ± 63",0.918 ± 0.001,2.0,2.4
+it2_tf_aug,"Transformer encoder (4 capas, d=192) + aumentos",3,1833650.0,0.999 ± 0.002,0.935 ± 0.008,0.895 ± 0.012,0.966 ± 0.007,0.894 ± 0.013,0.84 ± 0.03,"6,649 ± 27",0.931 ± 0.002,3.6,1.0
+it3_tf_aug_small,"Transformer más pequeño (3 capas, d=128, dropout 0.3)",3,630962.0,0.996 ± 0.002,0.921 ± 0.005,0.880 ± 0.005,0.964 ± 0.004,0.878 ± 0.004,0.91 ± 0.02,"6,695 ± 53",0.935 ± 0.001,2.1,0.5
+it4_tl_tf_congelado,"TL: Transformer preentrenado en 450 señas, backbone congelado",3,1833650.0,0.992 ± 0.007,0.928 ± 0.013,0.886 ± 0.005,0.968 ± 0.006,0.885 ± 0.004,0.68 ± 0.03,"6,757 ± 51",0.935 ± 0.001,0.3 + 4.3 preentreno,1.0
+it5_tl_tf_finetune,TL: Transformer preentrenado + fine-tuning completo (lr backbone 1e-4),3,1833650.0,0.998 ± 0.001,0.944 ± 0.003,0.899 ± 0.008,0.972 ± 0.001,0.897 ± 0.009,0.80 ± 0.03,"6,739 ± 21",0.935 ± 0.001,0.8 + 4.3 preentreno,1.0
+it6_tl_lstm_finetune,TL: LSTM preentrenada en 450 señas + fine-tuning,3,1531442.0,0.999 ± 0.001,0.928 ± 0.013,0.873 ± 0.002,0.956 ± 0.008,0.870 ± 0.002,0.63 ± 0.05,"6,622 ± 51",0.929 ± 0.001,1.0 + 4.5 preentreno,2.4

@@ -1,0 +1,72 @@
+{
+  "versiones": {
+    "v0": {
+      "it": "it0_lstm_base",
+      "seed": 2,
+      "tau": 0.98
+    },
+    "v1": {
+      "it": "it2_tf_aug",
+      "seed": 0,
+      "tau": 0.8300000000000001
+    },
+    "v2": {
+      "it": "it5_tl_tf_finetune",
+      "seed": 2,
+      "tau": 0.78
+    }
+  },
+  "desplegado": "v2",
+  "ic95_diferencias_valor": {
+    "v1_menos_v0": [
+      255.99807269022787,
+      724.9735498659448
+    ],
+    "v2_menos_v1": [
+      14.48731887213942,
+      220.91324652718248
+    ],
+    "v2_menos_v0": [
+      376.9839883818603,
+      865.3981725207135
+    ]
+  },
+  "escenarios": {
+    "v0": {
+      "base": 6168.984201129545,
+      "pesimista": -14.048836580087226,
+      "umbral_pesimista": 1.0
+    },
+    "v1": {
+      "base": 6636.9609719680875,
+      "pesimista": 207.6436366971862,
+      "umbral_pesimista": 0.92
+    },
+    "v2": {
+      "base": 6754.413017806811,
+      "pesimista": 307.7873467158414,
+      "umbral_pesimista": 0.89
+    }
+  },
+  "supuestos": {
+    "t_grabar": 8.0,
+    "t_rev3": 15.0,
+    "t_rev10": 45.0,
+    "t_manual": 180.0,
+    "p_manual": 0.65,
+    "p_engano": 0.3,
+    "p_engano_aviso": 0.05,
+    "c_error": 600.0,
+    "c_no_resuelta": 300.0,
+    "p_vocab": 0.85,
+    "busquedas_mes": 10000,
+    "valor_hora": 12.0,
+    "costo_fijo_mes": 25.0,
+    "costo_pred": 2e-05
+  },
+  "costo_manual_seg": 285.0,
+  "preentreno_min": {
+    "pre_lstm": 4.453332532776727,
+    "pre_tf": 4.328942765129937
+  }
+}

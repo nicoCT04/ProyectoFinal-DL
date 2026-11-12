@@ -1,0 +1,40 @@
+{
+  "descripcion": "60 videos de prueba (participantes no vistos, muestra con semilla 11) pasados por el flujo completo de la app en el navegador: MediaPipe Tasks JS modo VIDEO + segmentación automática + /api/predict. Videos cargados con el botón de subir video (mismo flujo que la cámara).",
+  "v2_desplegado": {
+    "n": 60,
+    "top1": 57,
+    "top3": 59,
+    "top10": 60,
+    "modo_seguro": 51,
+    "modelo": "it5_tl_tf_finetune_s2 (umbral 0.78)",
+    "fallos_top3": [
+      "SISTER -> TIME/STOP/FRIEND"
+    ]
+  },
+  "v0": {
+    "n": 60,
+    "top1": 44,
+    "top3": 54,
+    "top10": 58,
+    "modo_seguro": 38,
+    "modelo": "it0_lstm_base_s2 (umbral 0.98)"
+  },
+  "transformer_video": {
+    "n": 60,
+    "top1": 57,
+    "top3": 59,
+    "top10": 60,
+    "modo_seguro_umbral_0.9": 39,
+    "fallos_top3": [
+      "MOTHER -> BAD/WATER/THANKYOU"
+    ],
+    "modelo": "it2_tf_aug_s2 (extracción VIDEO)"
+  },
+  "transformer_image": {
+    "n": 60,
+    "top1": 50,
+    "top3": 56,
+    "top10": 60,
+    "modelo": "it2_tf_aug_s2 entrenado con extracción IMAGE"
+  }
+}

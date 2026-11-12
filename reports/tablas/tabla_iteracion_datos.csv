@@ -1,0 +1,5 @@
+Iteración,A: entrena IMAGE / evalúa IMAGE (top-1 | top-3),B: entrena IMAGE / evalúa VIDEO = app (top-1 | top-3),C: entrena VIDEO / evalúa VIDEO (top-1 | top-3)
+it0_lstm_base,0.679 | 0.869,0.643 | 0.830,0.689 | 0.870
+it1_lstm_aug,0.768 | 0.920,0.722 | 0.888,0.813 | 0.932
+it2_tf_aug,0.887 | 0.960,0.837 | 0.946,0.895 | 0.966
+it3_tf_aug_small,0.880 | 0.962,0.820 | 0.940,0.880 | 0.964
