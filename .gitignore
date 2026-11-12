@@ -1,0 +1,36 @@
+# Entorno
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+scripts/informe/node_modules/
+scripts/informe/package*.json
+
+# Datos de ASL Citizen y TODO lo derivado de ellos (la licencia prohíbe redistribuirlos)
+data/raw/
+data/landmarks/
+data/landmarks_image/
+data/cache/
+data/cache_image/
+models/plantillas.npz
+reports/**/*_probs.npz
+app/static/_prueba_e2e.json
+
+# Registros locales de la app (pueden contener datos de usuarios de prueba)
+logs/
+
+# Pesos de MediaPipe (se descargan con scripts/00_descargar_mediapipe.sh)
+models/mediapipe/*.task
+
+# Pesos entrenados: solo se versionan los 3 que usa la app (models/despliegue.json).
+# El resto se regenera con scripts/run_all.sh.
+models/*.pt
+models/image_mode/
+!models/it0_lstm_base_s2.pt
+!models/it2_tf_aug_s0.pt
+!models/it5_tl_tf_finetune_s2.pt
+
+# Lista de videos/participantes del subconjunto: viene de los splits de ASL Citizen (no redistribuible);
+# se regenera igual con scripts/01_seleccionar_y_descargar.py (semilla fija).
+data/subconjunto.csv
