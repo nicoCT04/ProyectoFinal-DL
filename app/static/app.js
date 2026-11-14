@@ -12,6 +12,28 @@ const { FilesetResolver, HandLandmarker, PoseLandmarker } = vision;
 const $ = (id) => document.getElementById(id);
 const video = $("video"), overlay = $("overlay"), ctx = overlay.getContext("2d");
 const SESION = Math.random().toString(36).slice(2, 10);
+// ?debug=1: la segmentación reporta sus eventos y miniaturas al servidor (logs/ local, nunca se publica).
+const DEBUG = new URLSearchParams(location.search).has("debug");
+const thumbCanvas = document.createElement("canvas");
+thumbCanvas.width = 160; thumbCanvas.height = 120;
+let thumbnails = [], frameCount = 0;
+
+function debugEvent(ev, extra = {}) {
+  if (!DEBUG) return;
+  fetch("/api/debug", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ev, sesion: SESION, t_video: video.currentTime, estado, conManos, reposo, armado,
+                           buffer: buffer.length, ...extra }) });
+}
+function grabThumbnail() {
+  thumbCanvas.getContext("2d").drawImage(video, 0, 0, 160, 120);
+  thumbnails.push(thumbCanvas.toDataURL("image/jpeg", 0.6));
+}
+function sendThumbnails(key) {
+  if (!DEBUG || !thumbnails.length) return;
+  fetch("/api/debug_frames", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, images: thumbnails }) });
+  thumbnails = [];
+}
 
 // Parámetros de la segmentación automática (cuadros a ~30 fps).
 // framesFin 18 (0.6 s) evita partir una seña cuando MediaPipe pierde la mano un instante;
@@ -152,13 +174,15 @@ function procesar(fr, ts) {
     conManos = hay ? conManos + 1 : 0;
     // Tras una búsqueda hay que bajar las manos antes de grabar otra (evita grabaciones en bucle).
     reposo = hay ? 0 : reposo + 1;
-    if (!armado && reposo >= CFG.framesFin) armado = true;
+    if (!armado && reposo >= CFG.framesFin) { armado = true; debugEvent("rearmado"); }
     if (armado && conManos >= CFG.framesInicio && ts - ultimoFin > CFG.enfriamientoMs) {
-      estado = "grabando"; buffer = [...previos]; sinManos = 0;
+      estado = "grabando"; buffer = [...previos]; sinManos = 0; thumbnails = [];
       setEstado("grabando", "Grabando… baja las manos al terminar");
+      debugEvent("inicio");
     }
   } else if (estado === "grabando") {
     buffer.push(fr);
+    if (DEBUG && buffer.length % 4 === 0) grabThumbnail();
     sinManos = hay ? 0 : sinManos + 1;
     if (sinManos >= CFG.framesFin || buffer.length >= CFG.maxFrames) finalizar();
   }
@@ -174,6 +198,8 @@ async function finalizar() {
   buffer = []; sinManos = 0; conManos = 0; ultimoFin = performance.now(); armado = false; reposo = 0;
   const n = frames.filter(manoActiva).length;
   if (n < CFG.minConManos) {
+    debugEvent("descartada", { cuadros: frames.length, activos: n, muyLarga });
+    sendThumbnails(`descartada_${SESION}_${Date.now()}`);
     estado = "espera"; setEstado("espera", "Muy corto o no vi tus manos. Intenta de nuevo.");
     return;
   }
@@ -182,6 +208,9 @@ async function finalizar() {
   const r = await (await fetch("/api/predict", { method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ frames, modelo: $("modelo").value, sesion: SESION }) })).json();
   medidas = { total: performance.now() - t0, servidor: r.ms_servidor, modelo: r.ms_modelo, cuadros: frames.length };
+  debugEvent("enviada", { cuadros: frames.length, activos: n, muyLarga, id_prediccion: r.id_prediccion,
+                          top3: (r.candidatos || []).slice(0, 3).map(c => c.glosa), confianza: r.confianza_top3 });
+  sendThumbnails(r.id_prediccion || `sin_id_${Date.now()}`);
   mostrar(r);
   estado = "listo"; ultimoFin = performance.now();
   setEstado("listo", muyLarga ? "Grabación muy larga: baja las manos por debajo de la línea al terminar"

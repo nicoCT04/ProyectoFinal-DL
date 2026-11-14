@@ -12,8 +12,10 @@ Ejecutar:  .venv/bin/uvicorn app.server:app --port 8000   (desde la raíz del pr
 """
 from __future__ import annotations
 
+import base64
 import json
 import os
+import re
 import sys
 import tempfile
 import time
@@ -24,7 +26,7 @@ from typing import Optional
 import numpy as np
 import torch
 import torch.nn.functional as F
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import Body, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -189,6 +191,30 @@ async def predict_video(file: UploadFile = File(...), modelo: Optional[str] = No
 def feedback(fb: Feedback):
     log(dict(tipo="feedback", **fb.model_dump()))
     return dict(ok=True)
+
+
+class DebugFrames(BaseModel):
+    key: str
+    images: list[str]
+
+
+@app.post("/api/debug")
+def debug(event: dict = Body(...)):
+    event["ts"] = time.time()
+    with open(LOGS / "segmentacion.jsonl", "a") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    return dict(ok=True)
+
+
+@app.post("/api/debug_frames")
+def debug_frames(req: DebugFrames, request: Request):
+    if request.client is None or request.client.host not in ("127.0.0.1", "::1", "testclient"):
+        raise HTTPException(403)
+    folder = LOGS / "miniaturas" / re.sub(r"[^\w-]", "", req.key)[:60]
+    folder.mkdir(parents=True, exist_ok=True)
+    for i, img in enumerate(req.images[:120]):
+        (folder / f"{i:03d}.jpg").write_bytes(base64.b64decode(img.split(",", 1)[-1]))
+    return dict(ok=True, n=len(req.images))
 
 
 @app.get("/api/ejemplo/{glosa}")
