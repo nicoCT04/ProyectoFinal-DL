@@ -16,7 +16,7 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const TAB = path.join(ROOT, "reports", "tablas");
 const FIG = path.join(ROOT, "reports", "figuras");
 const OUT = path.join(ROOT, "reports", "Informe_ProyectoFinal_ASL.docx");
-const LOGO = path.resolve(ROOT, "..", "uvg_logo.png");
+const LOGO = path.join(__dirname, "uvg_logo.png");
 const REPO_URL = "https://github.com/nicoCT04/ProyectoFinal-DL";
 const FECHA = "Guatemala, noviembre de 2026";
 
@@ -105,7 +105,7 @@ function TABLA(cab, filas, anchos, pie, fs_ = 16) {
 const cover = [
   new Paragraph({ spacing: { before: 1200 }, children: [] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 },
-    children: [new ImageRun({ type: "png", data: fs.readFileSync(LOGO), transformation: { width: 150, height: 150 } })] }),
+    children: [new ImageRun({ type: "png", data: fs.readFileSync(LOGO), transformation: { width: 100, height: 150 } })] }),
   C("Universidad del Valle de Guatemala", { b: true }),
   C("Facultad de Ingeniería"),
   C("CC3092 — Deep Learning y Sistemas Inteligentes", { after: 260 }),
@@ -186,6 +186,7 @@ const content = [
   ...IMG("curvas_entrenamiento.png", 560, "Curvas de pérdida (train punteada, validación continua) y top-1 de validación de las iteraciones relevantes (semilla 0)."),
   P([{ t: "Problemas encontrados. ", b: true }, { t: N.frase_problemas }]),
   P([{ t: "Iteración de datos: desajuste entre entrenamiento y producción. ", b: true }, { t: N.frase_iteracion_datos }]),
+  ...(N.frase_webcam ? [P([{ t: "Iteración guiada por la cámara en vivo (it7). ", b: true }, { t: N.frase_webcam }])] : []),
   ...TABLA(["Iteración", "A: entrena IMAGE / evalúa IMAGE", "B: entrena IMAGE / evalúa VIDEO (= app)", "C: entrena VIDEO / evalúa VIDEO"],
     csv("tabla_iteracion_datos.csv").map(r => Object.values(r)),
     [2, 2.6, 2.6, 2.6], "Top-1 | top-3 en prueba (media de 3 semillas) según el modo de extracción de MediaPipe usado al entrenar y al evaluar.", 15),
@@ -195,8 +196,10 @@ const content = [
   H1("6. Despliegue, experiencia de usuario, explicabilidad y riesgos"),
   H2("6.1 Arquitectura desplegada"),
   ...IMG("arquitectura.png", 600, "Arquitectura del sistema desplegado."),
-  P(`La app (app/) es un servidor FastAPI que sirve la interfaz web y expone /api/predict. MediaPipe Tasks corre en el navegador (WASM/GPU, ≈ 15 ms por cuadro), así que solo viajan los puntos clave (≈ 60 KB por seña) y no el video. La grabación empieza sola cuando aparecen las manos durante 4 cuadros y termina cuando desaparecen por 12, de modo que el usuario no toca botones; hay respaldo manual (grabar 4 s) y la opción de subir un video, que pasa por exactamente el mismo flujo. Un selector permite cambiar en vivo entre v0, v1 y v2 para la demostración. ${N.frase_latencia}`),
+  P(`La app (app/) es un servidor FastAPI que sirve la interfaz web y expone /api/predict. MediaPipe Tasks corre en el navegador (WASM/GPU, ≈ 15 ms por cuadro), así que solo viajan los puntos clave (≈ 60 KB por seña) y no el video. La grabación empieza sola cuando aparecen las manos por encima de la línea de reposo durante 4 cuadros y termina cuando bajan por 18 (0.6 s), de modo que el usuario no toca botones; hay respaldo manual (grabar 4 s) y la opción de subir un video, que pasa por exactamente el mismo flujo. Un selector permite cambiar en vivo entre v0, v1 y v2 para la demostración. ${N.frase_latencia}`),
   P([{ t: "Validación en el producto. ", b: true }, { t: N.frase_e2e }]),
+  ...(N.frase_camara ? [P([{ t: "Cámara en tiempo real. ", b: true }, { t: N.frase_camara }])] : []),
+  ...(N.frase_usuarios ? [P([{ t: "Prueba con usuarios. ", b: true }, { t: N.frase_usuarios }])] : []),
   P([{ t: "Experiencia de usuario. ", b: true }, { t: `Un mejor modelo cambia lo que ve el usuario: con mayor top-3 hay menos búsquedas que terminan en la lista de 10 o en la búsqueda manual, y con mejor separación de confianza hay menos "engaños". ${N.frase_ux}` }]),
   P([{ t: "Incertidumbre, errores y casos límite. ", b: true }, { t: "Si la confianza del top-3 está por debajo de τ, la interfaz lo dice (\"No estoy seguro\") y muestra 10 opciones; si hay menos de 5 cuadros con manos, pide repetir la seña acercándose a la cámara; cada tarjeta muestra la probabilidad y un esqueleto animado de cómo se hace la seña para que el usuario verifique antes de aceptar." }]),
   P([{ t: "Monitoreo. ", b: true }, { t: "Cada predicción y cada respuesta del usuario (\"Es esta\" con su posición, o \"Ninguna es\") se registran en logs/app_eventos.jsonl. En producción se vigilaría: (1) la confianza media y la fracción de búsquedas en modo \"no estoy seguro\" (deriva de datos: cámaras nuevas, señas fuera de vocabulario), (2) la tasa de \"Ninguna es\" y la posición elegida (proxy del top-3 real), (3) la fracción de cuadros con manos detectadas (calidad de entrada) y (4) la latencia p95. Los ejemplos etiquetados por los usuarios sirven para re-entrenar." }]),
