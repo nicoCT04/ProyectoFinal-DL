@@ -15,8 +15,9 @@ const SESION = Math.random().toString(36).slice(2, 10);
 
 // Parámetros de la segmentación automática (cuadros a ~30 fps).
 // framesFin 18 (0.6 s) evita partir una seña cuando MediaPipe pierde la mano un instante;
-// minConManos 15 descarta fragmentos (una seña del dataset tiene ~30 cuadros con mano).
-const CFG = { framesInicio: 4, framesFin: 18, preRoll: 6, minConManos: 15, maxFrames: 180,
+// minConManos 8: en ASL Citizen el 4.3 % de las señas tiene menos de 15 cuadros con mano activa
+// (MOTHER, LIKE, HELLO…) y con 8 solo el 0.3 %; los gestos sueltos los atrapa el umbral de confianza.
+const CFG = { framesInicio: 4, framesFin: 18, preRoll: 6, minConManos: 8, maxFrames: 180,
               enfriamientoMs: 800, vivoVentana: 60, vivoCadaMs: 450,
               kReposo: 1.3 };   // mano "activa" si la muñeca o el nudillo está por encima de hombros + 1.3·ancho
 
