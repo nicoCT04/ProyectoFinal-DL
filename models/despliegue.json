@@ -16,11 +16,11 @@
       "seed": 0
     },
     "v2": {
-      "archivo": "it5_tl_tf_finetune_s2",
+      "archivo": "it7_tl_tf_webcam_s1",
       "desc": "v2 · Transformer con transfer learning",
-      "umbral": 0.78,
-      "iteracion": "it5_tl_tf_finetune",
-      "seed": 2
+      "umbral": 0.83,
+      "iteracion": "it7_tl_tf_webcam",
+      "seed": 1
     }
   }
 }

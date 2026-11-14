@@ -48,6 +48,7 @@ DESCRIPCION = {
     "it4_tl_tf_congelado": "TL: Transformer preentrenado en 450 señas, backbone congelado",
     "it5_tl_tf_finetune": "TL: Transformer preentrenado + fine-tuning completo (lr backbone 1e-4)",
     "it6_tl_lstm_finetune": "TL: LSTM preentrenada en 450 señas + fine-tuning",
+    "it7_tl_tf_webcam": "it5 + aumentos de cámara en vivo (seña cortada, encuadre, mano perdida)",
     "pre_tf": "Preentrenamiento Transformer (450 señas, otra tarea)",
     "pre_lstm": "Preentrenamiento LSTM (450 señas, otra tarea)",
 }
@@ -185,7 +186,8 @@ def main():
 
     # ---------------- tabla de iteraciones (media ± desviación sobre semillas)
     orden = ["clasico_logreg", "clasico_knn", "it0_lstm_base", "it1_lstm_aug", "it2_tf_aug",
-             "it3_tf_aug_small", "it4_tl_tf_congelado", "it5_tl_tf_finetune", "it6_tl_lstm_finetune"]
+             "it3_tf_aug_small", "it4_tl_tf_congelado", "it5_tl_tf_finetune", "it6_tl_lstm_finetune",
+             "it7_tl_tf_webcam"]
     g = df.groupby("iteracion")
     filas = []
     for it in [o for o in orden if o in g.groups]:
@@ -218,7 +220,7 @@ def main():
         return max(cands, key=lambda c: (medias.loc[c, "val_top3"], medias.loc[c, "val_top1"]))
     # v2 = transfer learning con la MISMA arquitectura que v1 (Transformer), para comparar modelo base vs.
     # ajustado como pide el enunciado; it6 (LSTM + TL) se reporta como evidencia adicional.
-    tl = [c for c in ["it4_tl_tf_congelado", "it5_tl_tf_finetune"] if c in medias.index]
+    tl = [c for c in ["it4_tl_tf_congelado", "it5_tl_tf_finetune", "it7_tl_tf_webcam"] if c in medias.index]
     versiones = {"v0": "it0_lstm_base", "v1": "it2_tf_aug",
                  # (si aún no hay corridas de TL, se usa provisionalmente LSTM+aumentos)
                  "v2": mejor(tl) if tl else "it1_lstm_aug"}

@@ -143,7 +143,10 @@ def main():
         f"del Transformer {pre.get('pre_tf', float('nan')):.1f} min y el fine-tuning ≈ {mean_of(it.loc['it5_tl_tf_finetune','Entrenamiento (min, M4 Pro)'].split('+')[0]) if 'it5_tl_tf_finetune' in it.index else float('nan'):.1f} min. "
         f"A precio de una instancia GPU en la nube (≈ 0.5–1 USD/h), entrenar cualquier versión cuesta centavos; la extracción de puntos clave "
         f"(≈ 1 h de CPU para 15 300 videos) es el paso más caro. En inferencia los modelos tardan {lat.min():.1f}–{lat.max():.1f} ms por seña en CPU, "
-        f"por lo que un servidor de {S.costo_fijo_mes:.0f} USD/mes sobra para 10 000 búsquedas/mes.")
+        f"por lo que un servidor de {S.costo_fijo_mes:.0f} USD/mes sobra para 10 000 búsquedas/mes."
+        + (" La iteración it7 se entrenó después en una laptop con GPU NVIDIA RTX 4050: "
+           f"{mean_of(it.loc['it7_tl_tf_webcam','Entrenamiento (min, M4 Pro)'].split('+')[0]):.1f} min por semilla."
+           if "it7_tl_tf_webcam" in it.index else ""))
 
     filas_it = it.reset_index()
     N["frase_iteraciones"] = (
@@ -205,13 +208,42 @@ def main():
         v_, i_, d2, d0 = e2e["transformer_video"], e2e["transformer_image"], e2e["v2_desplegado"], e2e["v0"]
         N["frase_e2e"] = (
             f"Prueba de punta a punta: {d2['n']} videos de prueba (personas no vistas) se pasaron por el flujo completo de la app en el navegador "
-            f"(MediaPipe JS, segmentación automática y API). La versión desplegada (v2) acertó {d2['top1']}/{d2['n']} en la primera opción, "
+            f"(MediaPipe JS, segmentación automática y API). La v2 de ese momento ({d2['modelo'].split(' ')[0]}) acertó {d2['top1']}/{d2['n']} en la primera opción, "
             f"{d2['top3']}/{d2['n']} dentro de las 3 mostradas y mostró {d2['modo_seguro']}/{d2['n']} búsquedas en modo seguro; v0 acertó "
             f"{d0['top1']}/{d0['n']} y {d0['top3']}/{d0['n']}. El Transformer desde cero entrenado con la extracción IMAGE original acertaba "
             f"{i_['top1']}/{i_['n']} y {i_['top3']}/{i_['n']}, contra {v_['top1']}/{v_['n']} y {v_['top3']}/{v_['n']} tras re-extraer en VIDEO. "
             "Esta prueba valida que lo medido offline se sostiene en el producto real.")
     else:
         N["frase_e2e"] = "(Pendiente: correr la prueba de docs/PRUEBA_E2E_APP.md.)"
+
+    if (TAB / "robustez_webcam.csv").exists() and "it7_tl_tf_webcam" in it.index:
+        rb = pd.read_csv(TAB / "robustez_webcam.csv").set_index("perturbación")
+        a, b = "it5_tl_tf_finetune top3", "it7_tl_tf_webcam top3"
+        N["frase_webcam"] = (
+            "Al probar la app como la usaría una persona, encontramos que lo que más baja el acierto no es el modelo sino lo que "
+            "la cámara le entrega: la seña cortada por la segmentación, los hombros fuera de cuadro o la cámara demasiado cerca. "
+            "Medido sobre los puntos crudos del conjunto de prueba (scripts/14_robustez_webcam.py), el top-3 de it5 cae de "
+            f"{rb.loc['original', a]:.3f} a {rb.loc['seña cortada: último 60 %', a]:.3f} si se pierde el inicio de la seña, a "
+            f"{rb.loc['hombros sin detectar', a]:.3f} sin hombros y a {rb.loc['cámara 1.4× más cerca', a]:.3f} con la cámara más cerca. "
+            "La iteración it7 repite el fine-tuning de it5 con aumentos que imitan esas fallas (recorte de 0–40 % por un extremo, "
+            "escala y traslación grandes, mano perdida varios cuadros seguidos). En prueba limpia no pierde nada "
+            f"({it.loc['it7_tl_tf_webcam','Top-1 test']} / {it.loc['it7_tl_tf_webcam','Top-3 test']} de top-1 / top-3) y es más robusta: "
+            f"{rb.loc['seña cortada: último 60 %', b]:.3f}, {rb.loc['hombros sin detectar', b]:.3f} y {rb.loc['cámara 1.4× más cerca', b]:.3f} "
+            "en esos mismos casos. Como también es la mejor en validación, el criterio de selección la eligió como v2.")
+    if (TAB / "prueba_camara_simulada.json").exists():
+        cs = json.loads((TAB / "prueba_camara_simulada.json").read_text())
+        mm, aj = cs["modelos"], cs["ajuste_segmentacion_60_videos"]
+        N["frase_camara"] = (
+            f"Prueba con cámara simulada en tiempo real (scripts/13_prueba_camara_simulada.py): los {cs['videos']} videos de prueba se "
+            "encadenaron en una transmisión continua que Chromium usó como webcam, así que pasan por el flujo real de la cámara "
+            f"(detección a ≈ {cs['detector_ms_por_cuadro']} ms por cuadro, segmentación automática y API) y no cuadro por cuadro. La primera "
+            f"corrida mostró que la segmentación descartaba señas cortas: exigía 15 cuadros con mano activa y en ASL Citizen el 4.3 % de "
+            f"las señas tiene menos. Bajarlo a 8 subió v2 de {aj['antes']['top1_n']}/60 a {aj['despues']['top1_n']}/60 en top-1 y de "
+            f"{aj['antes']['top3_n']}/60 a {aj['despues']['top3_n']}/60 en top-3. Con los {cs['videos']} videos, la app grabó "
+            f"{cs['videos'] - cs['senas_sin_grabacion']} señas ({cs['senas_sin_grabacion']} se perdieron, sobre todo señas rápidas a la "
+            f"altura del pecho como STOP y WORK, donde MediaPipe en el navegador pierde la mano) y la versión desplegada acertó "
+            f"{mm['v2']['top1'] * 100:.1f} % en la primera opción y {mm['v2']['top3'] * 100:.1f} % dentro de las 3 mostradas (v1 {mm['v1']['top3'] * 100:.1f} %, "
+            f"v0 {mm['v0']['top3'] * 100:.1f} % de top-3). Es la cifra más cercana al uso real: unos 5 puntos por debajo de la medición offline.")
 
     exp_all = json.loads((TAB / "explicabilidad_oclusion.json").read_text())
     exp = exp_all[dep]
@@ -222,9 +254,10 @@ def main():
     N["frase_explicabilidad"] = (
         f"Se aplicaron oclusión por parte del cuerpo, saliencia por gradiente y atención del token [CLS]. Al ocultar cada grupo de puntos, el top-3 "
         f"cae de {base3:.3f} a: " + "; ".join(f"{k} → {exp[k]:.3f}" for k, _ in orden) + ". "
-        f"El modelo depende sobre todo de {orden[0][0].replace('sin ', '')} (la mano dominante de la mayoría de participantes; ocultar las muñecas de la pose "
-        f"también la afecta), como se espera de un vocabulario donde la mayoría de las señas son "
-        f"de una mano dominante, pero también usa la ubicación respecto a la cara y los hombros. La saliencia por gradiente se concentra en la parte central de la seña "
+        f"Lo que más lo afecta es quitar {orden[0][0].replace('sin ', '')} y {orden[1][0].replace('sin ', '')}: el modelo usa la "
+        f"trayectoria de las manos (las muñecas de la pose y la mano derecha, la dominante de la mayoría de participantes) y su "
+        f"ubicación respecto al cuerpo, como se espera de un vocabulario donde la mayoría de las señas son de una mano dominante y "
+        f"se distinguen por dónde se hacen (cara, pecho). La saliencia por gradiente se concentra en la parte central de la seña "
         f"y cae en los cuadros de reposo del inicio y el final; la atención del [CLS] es más uniforme, pero también es menor en los extremos. En robustez: reflejada (persona zurda) el top-3 es {exp['espejo (zurdo)']:.3f}, con ruido gaussiano "
         f"{exp['ruido σ=0.05']:.3f} y con la seña cortada al 80 % {exp['seña cortada (80 %)']:.3f}.")
 

@@ -167,7 +167,7 @@ if ENTRENAR:
     import subprocess
     subprocess.run([sys.executable, "scripts/03_entrenar.py", "it0_lstm_base", "it1_lstm_aug", "it2_tf_aug",
                     "it3_tf_aug_small", "pre_tf", "pre_lstm", "it4_tl_tf_congelado", "it5_tl_tf_finetune",
-                    "it6_tl_lstm_finetune"], cwd=ROOT, check=True)
+                    "it6_tl_lstm_finetune", "it7_tl_tf_webcam"], cwd=ROOT, check=True)
     subprocess.run([sys.executable, "scripts/05_modelo_valor.py"], cwd=ROOT, check=True)
 tabla = pd.read_csv(TAB / "tabla_iteraciones.csv")
 display(tabla)
@@ -223,6 +223,22 @@ if (TAB / "tabla_iteracion_datos.csv").exists():
     display(pd.read_csv(TAB / "tabla_iteracion_datos.csv"))
 if (TAB / "prueba_app_e2e.json").exists():
     print(json.dumps(json.loads((TAB / "prueba_app_e2e.json").read_text()), indent=1, ensure_ascii=False))
+""")
+
+md("""
+### 4.2 Robustez ante la cámara en vivo (it7) y prueba con cámara simulada
+
+Fallas típicas de la cámara aplicadas a los puntos crudos de prueba (`scripts/14_robustez_webcam.py`):
+it7 repite el fine-tuning de it5 con aumentos que las imitan. Después, los 616 videos de prueba pasan
+por la app como una webcam en tiempo real (`scripts/13_prueba_camara_simulada.py`).
+""")
+code("""
+if (TAB / "robustez_webcam.csv").exists():
+    display(pd.read_csv(TAB / "robustez_webcam.csv"))
+if (TAB / "prueba_camara_simulada.json").exists():
+    cs = json.loads((TAB / "prueba_camara_simulada.json").read_text())
+    display(pd.DataFrame(cs["modelos"]).T[["archivo", "top1", "top3"]])
+    print({k: cs[k] for k in ["videos", "grabaciones", "senas_sin_grabacion", "senas_partidas"]})
 """)
 
 md("## 5. Explicabilidad, sesgos y robustez")

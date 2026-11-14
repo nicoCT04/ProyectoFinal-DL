@@ -7,23 +7,32 @@ El usuario hace una seña de lengua de señas americana (ASL) frente a la cámar
 las 3 coincidencias más probables con su significado en español. El prototipo reconoce 50 señas
 de uso cotidiano para estudiantes de ASL. El núcleo es un modelo de deep learning **entrenado por
 nosotros** sobre secuencias de puntos clave (MediaPipe): LSTM (v0), Transformer (v1) y Transformer
-con **transfer learning** desde 450 señas distintas (v2). Ninguna parte del sistema usa un LLM.
+con **transfer learning** desde 450 señas distintas y aumentos que imitan la cámara en vivo (v2).
+Ninguna parte del sistema usa un LLM.
 
 ## Resultados principales (prueba: 11 personas nunca vistas)
 
 | Versión | Modelo | Top-1 | Top-3 | Seg/búsqueda* | Valor neto USD/mes* [IC 95 %] | Latencia CPU |
 |---|---|---|---|---|---|---|
 | — | Regresión logística (sin DL) | 0.617 | 0.799 | — | 5,607 | 0.1 ms |
-| v0 | LSTM bidireccional desde cero | 0.656 | 0.862 | 99 s | 6,169 [5,891, 6,390] | 2.4 ms |
-| v1 | Transformer desde cero + aumentos | 0.883 | 0.969 | 85 s | 6,637 [6,541, 6,739] | 1.0 ms |
-| **v2** | **Transformer preentrenado en 450 señas + fine-tuning** | **0.894** | **0.972** | **82 s** | **6,754 [6,667, 6,838]** | **1.0 ms** |
+| v0 | LSTM bidireccional desde cero | 0.656 | 0.862 | 99 s | 6,169 [5,891, 6,390] | 2.1 ms |
+| v1 | Transformer desde cero + aumentos | 0.883 | 0.969 | 85 s | 6,637 [6,541, 6,739] | 1.7 ms |
+| **v2** | **Transformer preentrenado en 450 señas + fine-tuning + aumentos de cámara (it7)** | **0.906** | **0.981** | **80 s** | **6,795 [6,723, 6,860]** | **1.8 ms** |
 
 \* Modelo de valor (`asl/valor.py`): 500 estudiantes × 20 búsquedas/mes, búsqueda manual = 285 s
 equivalentes, 15 % de búsquedas fuera del vocabulario (medidas con videos reales de otras señas),
-umbral de confianza elegido en validación. v2 − v0 = +585 USD/mes (IC 95 % [377, 865]).
+umbral de confianza elegido en validación. v2 − v0 = +626 USD/mes (IC 95 % [442, 852]). Latencia
+medida en CPU (2 hilos, batch 1) con `scripts/10_latencia.py` en una laptop Intel.
 
-* **Prueba de punta a punta en la app** (60 videos de prueba por el flujo completo del navegador):
-  v2 acierta 57/60 en la primera opción y 59/60 en las 3 mostradas; v0, 44/60 y 54/60.
+* **Prueba con cámara simulada en tiempo real** (`scripts/13_prueba_camara_simulada.py`): los 616
+  videos de prueba encadenados como una webcam para Chromium. v2 acierta el 84.4 % en la primera
+  opción y el 93.0 % en las 3 mostradas (v1 90.3 %, v0 81.5 % de top-3). La primera corrida mostró que
+  la segmentación descartaba señas cortas; corregirlo subió v2 de 48/60 a 58/60 en top-3.
+* **Prueba de punta a punta cuadro por cuadro** (60 videos, `docs/PRUEBA_E2E_APP.md`): la v2 de ese
+  momento (it5) acertó 57/60 en la primera opción y 59/60 en las 3 mostradas; v0, 44/60 y 54/60.
+* **Iteración guiada por la cámara (it7):** el top-3 de it5 cae a 0.912 si la segmentación corta el
+  inicio de la seña y a 0.942 con la cámara muy cerca; con aumentos que imitan esas fallas, it7 queda
+  en 0.933 y 0.960 sin perder nada en prueba limpia (`reports/tablas/robustez_webcam.csv`).
 * **Iteración de datos:** extraer los landmarks en modo IMAGE (la primera versión) mientras la app
   usa modo VIDEO bajaba el top-1 del Transformer de 0.887 a 0.837 en datos como los de la app;
   re-extraer en VIDEO lo corrigió (0.895). Ver `reports/tablas/tabla_iteracion_datos.csv`.
@@ -53,6 +62,10 @@ ProyectoFinal-DL/
 │   ├── 05_modelo_valor.py              # tablas, curva de valor, sensibilidad, umbral, despliegue.json
 │   ├── 06_explicabilidad_y_plantillas.py
 │   ├── 07_diagrama_arquitectura.py  08_numeros_informe.py  09_iteracion_datos.py  10_latencia.py
+│   ├── 11_descargar_videos_prueba.py   # solo los 616 videos de prueba (sesión guiada, pruebas e2e)
+│   ├── 12_resumen_prueba_usuarios.py   # logs de la prueba con usuarios -> supuestos medidos
+│   ├── 13_prueba_camara_simulada.py    # la app con una webcam simulada en tiempo real
+│   ├── 14_robustez_webcam.py           # robustez ante fallas de la cámara en vivo
 │   ├── informe/build_informe.js        # genera el .docx del trabajo escrito
 │   ├── construir_notebook.py
 │   └── run_all.sh                      # reproduce todo
@@ -85,6 +98,12 @@ bash scripts/00_descargar_mediapipe.sh
 Abrir http://localhost:8000, encender la cámara y hacer una seña empezando y terminando con las
 manos abajo. También se puede subir un video. El selector de arriba cambia entre v0, v1 y v2 para
 comparar en vivo.
+
+* `/?prueba=usuarios`: sesión guiada de la prueba con usuarios (`docs/PROTOCOLO_PRUEBA_USUARIOS.md`).
+* `/?prueba=propia`: validación propia, recorre señas del vocabulario con un video de ejemplo.
+* `?debug=1`: guarda los eventos de la segmentación y miniaturas en `logs/` (solo local).
+* `bash scripts/00_descargar_mediapipe.sh` deja también una copia local de MediaPipe para el navegador:
+  la app funciona sin internet y, si no existe la copia, usa el CDN.
 
 La app necesita los 3 pesos listados en `models/despliegue.json` (~20 MB, los únicos que se versionan; el resto se regenera con `scripts/run_all.sh`). Las animaciones de
 ejemplo de cada seña (`models/plantillas.npz`) se generan localmente con el script 06 porque se

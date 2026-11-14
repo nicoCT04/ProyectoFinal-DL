@@ -28,7 +28,7 @@
   "dispositivo": "mps",
   "params": 1833650,
   "params_entrenables": 1833650,
-  "latencia_cpu_ms": 0.9848329937085509,
+  "latencia_cpu_ms": 1.7771614998309815,
   "train": {
     "loss": 0.05349737033247948,
     "top1": 1.0,
@@ -50,5 +50,5 @@
     "top5": 0.9577922224998474,
     "f1_macro": 0.8004703000395595
   },
-  "latencia_cpu_p95_ms": 1.010935491649434
+  "latencia_cpu_p95_ms": 1.9028135004646174
 }

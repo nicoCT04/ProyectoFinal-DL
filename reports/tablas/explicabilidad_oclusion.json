@@ -22,14 +22,14 @@
     "seña cortada (80 %)": 0.9707792207792207
   },
   "v2": {
-    "base_top3": 0.9724025974025974,
-    "sin cara (nariz, ojos, boca)": 0.6444805194805194,
-    "sin hombros y codos": 0.823051948051948,
-    "sin muñecas (pose)": 0.547077922077922,
-    "sin mano izquierda": 0.6753246753246753,
-    "sin mano derecha": 0.5227272727272727,
-    "espejo (zurdo)": 0.9756493506493507,
-    "ruido σ=0.05": 0.974025974025974,
-    "seña cortada (80 %)": 0.9675324675324676
+    "base_top3": 0.9805194805194806,
+    "sin cara (nariz, ojos, boca)": 0.577922077922078,
+    "sin hombros y codos": 0.7175324675324676,
+    "sin muñecas (pose)": 0.4935064935064935,
+    "sin mano izquierda": 0.7142857142857143,
+    "sin mano derecha": 0.5876623376623377,
+    "espejo (zurdo)": 0.9805194805194806,
+    "ruido σ=0.05": 0.9821428571428571,
+    "seña cortada (80 %)": 0.9788961038961039
   }
 }
