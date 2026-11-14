@@ -1,8 +1,13 @@
 // SeñaBusca — lógica del cliente.
 // MediaPipe (manos + pose) corre en el navegador; solo se envían los landmarks al servidor,
 // nunca el video (privacidad y menos ancho de banda).
-import { FilesetResolver, HandLandmarker, PoseLandmarker }
-  from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+// Se usa la copia local de MediaPipe (scripts/00_descargar_mediapipe.sh) si existe; si no, el CDN.
+const MP_CDN = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const MP_LOCAL = "/static/vendor/tasks-vision";
+let MP_BASE = MP_LOCAL, vision;
+try { vision = await import(`${MP_LOCAL}/vision_bundle.mjs`); }
+catch { MP_BASE = MP_CDN; vision = await import(`${MP_CDN}/vision_bundle.mjs`); }
+const { FilesetResolver, HandLandmarker, PoseLandmarker } = vision;
 
 const $ = (id) => document.getElementById(id);
 const video = $("video"), overlay = $("overlay"), ctx = overlay.getContext("2d");
@@ -45,8 +50,7 @@ async function init() {
     sel.appendChild(o);
   }
   $("vocab").innerHTML = info.vocabulario.map(v => `<span>${v.es} · ${v.glosa}</span>`).join("");
-  const fs = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+  const fs = await FilesetResolver.forVisionTasks(`${MP_BASE}/wasm`);
   hand = await HandLandmarker.createFromOptions(fs, {
     baseOptions: { modelAssetPath: "/mediapipe/hand_landmarker.task", delegate: "GPU" },
     runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4 });

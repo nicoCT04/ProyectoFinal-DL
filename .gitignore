@@ -22,6 +22,7 @@ logs/
 
 # Pesos de MediaPipe (se descargan con scripts/00_descargar_mediapipe.sh)
 models/mediapipe/*.task
+app/static/vendor/
 
 # Pesos entrenados: solo se versionan los 3 que usa la app (models/despliegue.json).
 # El resto se regenera con scripts/run_all.sh.
