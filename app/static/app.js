@@ -239,6 +239,7 @@ $("envivo").onchange = (e) => { if (!e.target.checked) $("vivo").classList.add("
 // ------------------------------------------------------------------ resultados
 function mostrar(r) {
   $("vacio").classList.add("oculto"); $("resultado").classList.remove("oculto"); $("gracias").classList.add("oculto");
+  window.dispatchEvent(new CustomEvent("senabusca:resultado", { detail: r }));
   if (!r.ok) {
     $("banner").className = "banner no_seguro"; $("banner").textContent = r.motivo;
     $("tarjetas").innerHTML = ""; return;
@@ -278,9 +279,11 @@ $("btnNinguna").onclick = () => enviarFeedback(null, null);
 
 async function enviarFeedback(glosa, rank) {
   if (!ultimaPred) return;
+  const ms = performance.now() - tMostrado;
   await fetch("/api/feedback", { method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id_prediccion: ultimaPred.id_prediccion, glosa_correcta: glosa, rank_elegido: rank,
-                           ms_hasta_elegir: performance.now() - tMostrado, sesion: SESION }) });
+                           ms_hasta_elegir: ms, sesion: SESION }) });
+  window.dispatchEvent(new CustomEvent("senabusca:feedback", { detail: { glosa, rank, ms } }));
   $("gracias").classList.remove("oculto");
 }
 
@@ -340,3 +343,4 @@ function seg(c, p, q) { c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]
 function setEstado(cls, txt) { const e = $("estado"); e.className = "estado " + cls; e.textContent = txt; }
 
 init().catch(err => setEstado("espera", "Error al iniciar: " + err));
+if (new URLSearchParams(location.search).has("prueba")) import("/static/prueba.js?v=3");

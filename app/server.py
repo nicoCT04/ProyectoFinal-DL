@@ -193,6 +193,10 @@ def feedback(fb: Feedback):
     return dict(ok=True)
 
 
+def is_local(request: Request) -> bool:
+    return request.client is not None and request.client.host in ("127.0.0.1", "::1", "testclient")
+
+
 class DebugFrames(BaseModel):
     key: str
     images: list[str]
@@ -208,13 +212,55 @@ def debug(event: dict = Body(...)):
 
 @app.post("/api/debug_frames")
 def debug_frames(req: DebugFrames, request: Request):
-    if request.client is None or request.client.host not in ("127.0.0.1", "::1", "testclient"):
+    if not is_local(request):
         raise HTTPException(403)
     folder = LOGS / "miniaturas" / re.sub(r"[^\w-]", "", req.key)[:60]
     folder.mkdir(parents=True, exist_ok=True)
     for i, img in enumerate(req.images[:120]):
         (folder / f"{i:03d}.jpg").write_bytes(base64.b64decode(img.split(",", 1)[-1]))
     return dict(ok=True, n=len(req.images))
+
+
+TEST_LOG = LOGS / "prueba_usuarios.jsonl"
+_test_videos: dict[str, list[str]] = {}
+
+
+@app.post("/api/prueba")
+def test_event(event: dict = Body(...)):
+    event["ts"] = time.time()
+    with open(TEST_LOG, "a") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    return dict(ok=True)
+
+
+@app.get("/api/prueba/participantes")
+def test_participants(modo: str = "usuarios"):
+    seen = set()
+    if TEST_LOG.exists():
+        for line in TEST_LOG.read_text().splitlines():
+            e = json.loads(line)
+            if e.get("tipo") == "inicio" and e.get("modo") == modo:
+                seen.add(e.get("participante"))
+    return dict(siguiente=len(seen) + 1)
+
+
+@app.get("/api/prueba/video/{glosa}/{k}")
+def test_video(glosa: str, k: int, request: Request):
+    """Video de la seña hecho por una persona del conjunto de prueba (solo local; nunca se publica)."""
+    if not is_local(request):
+        raise HTTPException(403)
+    if not _test_videos:
+        import pandas as pd
+        sub = pd.read_csv(ROOT / "data" / "subconjunto.csv")
+        sub = sub[(sub["grupo"] == "objetivo") & (sub["split"] == "test")].sort_values("Video file")
+        folder = ROOT / "data" / "raw" / "ASL_Citizen" / "videos"
+        for g, f in zip(sub["Gloss"], sub["Video file"]):
+            if (folder / f).exists():
+                _test_videos.setdefault(g, []).append(str(folder / f))
+    files = _test_videos.get(glosa)
+    if not files:
+        raise HTTPException(404, "Sin videos: correr scripts/11_descargar_videos_prueba.py")
+    return FileResponse(files[k % len(files)], media_type="video/mp4")
 
 
 @app.get("/api/ejemplo/{glosa}")
@@ -227,7 +273,7 @@ def ejemplo(glosa: str):
 @app.get("/dev/video/{nombre}")
 def video_local(nombre: str, request: Request):
     """Solo para pruebas locales: sirve un video de ASL Citizen descargado (nunca se publica)."""
-    if request.client is None or request.client.host not in ("127.0.0.1", "::1", "testclient"):
+    if not is_local(request):
         raise HTTPException(403)
     ruta = (ROOT / "data" / "raw" / "ASL_Citizen" / "videos" / Path(nombre).name)
     if not ruta.exists():

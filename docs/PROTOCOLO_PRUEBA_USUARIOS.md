@@ -4,50 +4,45 @@ Objetivo: medir con personas reales los supuestos del modelo de valor que hoy so
 (`t_manual`, `p_manual`, `t_rev3`, `t_grabar`) y comparar **búsqueda manual vs. SeñaBusca**.
 Duración: ~15 min por persona. Meta mínima: 5–8 participantes (compañeros de la U).
 
-## Preparación
+La app trae una **sesión guiada** que cronometra y registra todo: no hace falta cronómetro ni hoja
+de registro.
 
-1. Levantar la app: `.venv/bin/uvicorn app.server:app --port 8000` y abrir http://localhost:8000.
-2. Elegir **6 señas** del vocabulario (las 50 están en el desplegable "Ver las 50 señas…").
-   Sugeridas (mezcla de fáciles y difíciles según `reports/tablas/por_sena.csv`):
-   HELLO, THANKYOU, SCHOOL, UNDERSTAND, BATHROOM, TOMORROW.
-3. Tener a mano un video corto de cada seña hecho por **otra persona** (puede ser de un
-   diccionario en línea, p. ej. Lifeprint o Handspeak, abierto en otra pestaña). El participante NO
-   debe saber qué palabra es.
-4. Cronómetro (el del celular) y la hoja de registro de abajo.
+## Preparación (una vez)
 
-## Tarea A — búsqueda manual (3 señas)
+1. Videos de ejemplo de cada seña hechos por personas del conjunto de prueba (no se publican):
+   `.venv/bin/python scripts/11_descargar_videos_prueba.py` (~350 MB).
+2. Levantar la app: `.venv/bin/uvicorn app.server:app --port 8000`.
+3. Abrir en Chrome **http://localhost:8000/?prueba=usuarios&debug=1** (`debug=1` guarda además los
+   eventos de la segmentación y miniaturas en `logs/`, útil si algo falla).
+4. Laptop sobre la mesa, luz de frente, la persona sentada con los hombros visibles.
 
-"Te voy a mostrar una seña. Encuentra qué significa usando el diccionario en línea que quieras.
-Tienes máximo 5 minutos."  → anotar tiempo y si la encontró.
+## Sesión (la app guía cada paso)
 
-## Tarea B — con SeñaBusca (las otras 3 señas)
+1. Pedir consentimiento verbal y marcar la casilla. La app asigna el número (P1, P2…), el orden
+   A→B / B→A (alterna entre participantes) y 3 + 3 señas de HELLO, THANKYOU, SCHOOL, UNDERSTAND,
+   BATHROOM y TOMORROW, rotándolas para que cada seña pase por los dos métodos.
+2. **Tarea A — búsqueda manual (3 señas).** La app muestra la seña hecha por otra persona (sin decir
+   cuál es). «Empezar a buscar» inicia el reloj; la persona busca en otra pestaña (handspeak.com,
+   lifeprint.com, signasl.org…), escribe lo que cree que significa y toca «La encontré» o «Me rindo»
+   (máximo 5 min). La app muestra la respuesta correcta y el facilitador confirma si coincide.
+3. **Tarea B — con SeñaBusca (3 señas).** La app muestra la seña; «Listo» inicia el reloj; la persona
+   la imita frente a la cámara y toca «Es esta» en la opción correcta (o «Ninguna es»). Se registran
+   los intentos, el modo (seguro / no seguro), la confianza, la opción elegida y su posición.
+4. **Preguntas finales** (1–5): facilidad de cada método, confianza sin revisar el ejemplo, si la
+   usaría en un curso y cuánto pagaría al mes, más un comentario libre.
 
-"Mira la seña, imítala frente a la cámara y elige la opción correcta."  → la app registra sola en
-`logs/app_eventos.jsonl`: confianza, modo (seguro / no seguro), top-3 y, al tocar "Es esta",
-el rank elegido y `ms_hasta_elegir` (= `t_rev3` real). Anotar también el tiempo total con
-cronómetro (desde que ve la seña hasta que elige).
+## Validación propia
 
-> Alternar el orden A/B entre participantes (la mitad empieza con B) para evitar el efecto de
-> aprendizaje. Usar señas distintas en A y B para cada persona, rotándolas.
-
-## Preguntas finales (escala 1–5)
-
-1. ¿Qué tan fácil fue encontrar la seña con cada método?
-2. ¿Confiarías en la respuesta de la app sin revisar el video de ejemplo?
-3. ¿Lo usarías en tu curso? ¿Pagarías por algo así (cuánto al mes)?
-
-## Hoja de registro
-
-| Persona | Orden | Seña | Método | Tiempo (s) | ¿Encontró? | Rank en la app | Comentarios |
-|---|---|---|---|---|---|---|---|
-| P1 | A→B | HELLO | manual | | | – | |
-| P1 | A→B | SCHOOL | app | | | | |
+**http://localhost:8000/?prueba=propia&debug=1** recorre N señas del vocabulario (por defecto 20)
+mostrando un video de ejemplo y el nombre: sirve para que el equipo pruebe la app con su propia
+cámara antes de la presentación, con cada intento etiquetado.
 
 ## Cómo usar los resultados
 
-* Sustituir en `asl/valor.py` → `Supuestos` los valores medidos (`t_manual` = mediana de la tarea
-  A, `p_manual` = fracción encontrada, `t_rev3` = mediana de `ms_hasta_elegir`/1000) y volver a
-  correr `scripts/05_modelo_valor.py`. El informe debe decir explícitamente cuáles supuestos
-  vienen de la prueba y cuáles siguen siendo estimaciones.
-* Los registros de `logs/` pueden contener datos de personas: no subirlos al repositorio
-  (ya están en `.gitignore`) y pedir consentimiento verbal antes de la prueba.
+* `.venv/bin/python scripts/12_resumen_prueba_usuarios.py` genera `reports/tablas/prueba_usuarios.json`
+  y `docs/RESULTADOS_PRUEBA_USUARIOS.md` (anónimos) y muestra los supuestos medidos
+  (`--excluir P3` descarta una sesión fallida).
+* Sustituir esos valores en `asl/valor.py` → `Supuestos` y volver a correr `scripts/05_modelo_valor.py`
+  y `scripts/08_numeros_informe.py`. El informe debe decir cuáles supuestos vienen de la prueba y
+  cuáles siguen siendo estimaciones.
+* `logs/` tiene datos de personas (registros y miniaturas): no se sube al repositorio (`.gitignore`).

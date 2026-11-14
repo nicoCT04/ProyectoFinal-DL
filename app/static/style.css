@@ -66,3 +66,30 @@ button.primario { background: var(--acento); border-color: var(--acento); color:
 .gracias { margin-top: 10px; color: var(--ok); font-size: 14px; }
 .oculto { display: none !important; }
 footer { padding: 0 24px 24px; font-size: 12px; color: var(--suave); }
+
+/* Sesión de prueba (?prueba=usuarios | ?prueba=propia) */
+body.con-prueba { padding-bottom: 0; }
+.prueba-panel { position: fixed; right: 16px; bottom: 16px; width: min(420px, calc(100vw - 32px));
+                max-height: calc(100vh - 32px); overflow: auto; z-index: 10; background: var(--panel);
+                border: 2px solid var(--acento); border-radius: 14px; padding: 14px 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,.25); font-size: 14px; line-height: 1.45; }
+.prueba-panel.compacto { width: min(240px, calc(100vw - 32px)); right: auto; left: 16px; }
+.prueba-panel h2 { margin: 0 0 8px; font-size: 18px; }
+.prueba-panel p { margin: 8px 0; }
+.prueba-panel input, .prueba-panel textarea { font: inherit; width: 100%; margin: 6px 0; padding: 8px;
+                border-radius: 8px; border: 1px solid var(--borde); background: var(--bg); color: var(--texto); }
+.prueba-panel textarea { min-height: 60px; }
+.prueba-panel label { display: block; margin: 8px 0; }
+.prueba-check { display: flex !important; gap: 8px; align-items: flex-start; }
+.prueba-check input { width: auto; margin-top: 3px; }
+.prueba-video { position: static; display: block; transform: none; width: 100%; height: auto; aspect-ratio: 4 / 3;
+                background: #000; border-radius: 10px; object-fit: contain; }
+.prueba-paso { font-size: 12px; color: var(--suave); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.prueba-reloj { font-variant-numeric: tabular-nums; font-weight: 650; color: var(--texto); }
+.prueba-glosa { font-size: 20px; font-weight: 650; }
+.prueba-botones { display: flex; gap: 8px; flex-wrap: wrap; }
+.prueba-escala { margin: 10px 0; }
+.prueba-escala > div { display: flex; gap: 6px; margin-top: 4px; }
+.prueba-escala button { flex: 1; padding: 6px 0; }
+.prueba-escala button.elegido { background: var(--acento); border-color: var(--acento); color: #fff; }
+.prueba-nota { color: var(--suave); font-size: 12px; }
