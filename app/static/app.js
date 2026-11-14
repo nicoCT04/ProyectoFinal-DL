@@ -74,12 +74,16 @@ async function init() {
   }
   $("vocab").innerHTML = info.vocabulario.map(v => `<span>${v.es} · ${v.glosa}</span>`).join("");
   const fs = await FilesetResolver.forVisionTasks(`${MP_BASE}/wasm`);
-  hand = await HandLandmarker.createFromOptions(fs, {
-    baseOptions: { modelAssetPath: "/mediapipe/hand_landmarker.task", delegate: "GPU" },
-    runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4 });
-  pose = await PoseLandmarker.createFromOptions(fs, {
-    baseOptions: { modelAssetPath: "/mediapipe/pose_landmarker_lite.task", delegate: "GPU" },
-    runningMode: "VIDEO", numPoses: 1 });
+  // Sin WebGL (aceleración por hardware apagada, algunos navegadores embebidos) el delegado GPU falla: se usa CPU.
+  const create = async (delegate) => {
+    hand = await HandLandmarker.createFromOptions(fs, {
+      baseOptions: { modelAssetPath: "/mediapipe/hand_landmarker.task", delegate },
+      runningMode: "VIDEO", numHands: 2, minHandDetectionConfidence: 0.4, minHandPresenceConfidence: 0.4 });
+    pose = await PoseLandmarker.createFromOptions(fs, {
+      baseOptions: { modelAssetPath: "/mediapipe/pose_landmarker_lite.task", delegate },
+      runningMode: "VIDEO", numPoses: 1 });
+  };
+  try { await create("GPU"); } catch (err) { console.warn("MediaPipe sin GPU, se usa CPU:", err); await create("CPU"); }
   setEstado("espera", "Listo. Enciende la cámara.");
 }
 
