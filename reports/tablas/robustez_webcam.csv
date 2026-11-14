@@ -1,0 +1,11 @@
+perturbación,it5_tl_tf_finetune top1,it5_tl_tf_finetune top3,it7_tl_tf_webcam top1,it7_tl_tf_webcam top3
+original,0.899,0.972,0.9,0.977
+seña cortada: primer 60 %,0.81,0.927,0.82,0.95
+seña cortada: último 60 %,0.81,0.912,0.825,0.933
+seña cortada: primer 80 %,0.88,0.962,0.886,0.97
+manos perdidas en 20 % de cuadros,0.898,0.969,0.897,0.975
+manos perdidas en 40 % de cuadros,0.894,0.969,0.89,0.975
+15 fps,0.896,0.965,0.894,0.973
+hombros sin detectar,0.798,0.929,0.807,0.938
+cámara 1.4× más cerca,0.841,0.942,0.859,0.96
+15 cuadros de reposo extra al final,0.873,0.964,0.867,0.968

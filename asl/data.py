@@ -70,7 +70,7 @@ def reflejar(x: np.ndarray) -> np.ndarray:
     return np.concatenate([pts.reshape(T, -1), pres], axis=1)
 
 
-def aumentar(x: np.ndarray, rng: np.random.Generator) -> np.ndarray:
+def aumentar(x: np.ndarray, rng: np.random.Generator, webcam: bool = False) -> np.ndarray:
     T = x.shape[0]
     if rng.random() < 0.5:
         x = reflejar(x)
@@ -94,7 +94,31 @@ def aumentar(x: np.ndarray, rng: np.random.Generator) -> np.ndarray:
     pts += rng.normal(0, 0.01, pts.shape)
     drop = rng.random(T) < 0.05
     pts[drop] = pts[np.maximum(np.where(drop)[0] - 1, 0)]
+    if webcam:
+        pts, pres = webcam_augment(pts, pres, rng)
     return np.concatenate([pts.reshape(T, -1), pres], axis=1).astype(np.float32)
+
+
+def webcam_augment(pts: np.ndarray, pres: np.ndarray, rng: np.random.Generator):
+    """Fallas típicas de la cámara en vivo, medidas con la app: grabación cortada por un lado,
+    hombros mal estimados (encuadre cercano) y la mano perdida varios cuadros seguidos."""
+    T = pts.shape[0]
+    if rng.random() < 0.5:
+        keep = rng.uniform(0.6, 1.0) * (T - 1)
+        a = 0.0 if rng.random() < 0.5 else (T - 1) - keep
+        pos = np.linspace(a, a + keep, T)
+        i0 = np.floor(pos).astype(int); i1 = np.minimum(i0 + 1, T - 1); w = (pos - i0)[:, None, None]
+        pts = (1 - w) * pts[i0] + w * pts[i1]
+        pres = pres[np.round(pos).astype(int)]
+    if rng.random() < 0.3:
+        pts[..., :2] = pts[..., :2] * rng.uniform(0.7, 1.3) + rng.uniform(-0.4, 0.4, size=2)
+    if rng.random() < 0.3:
+        side = rng.integers(2)
+        hand = slice(N_POSE + side * N_HAND, N_POSE + (side + 1) * N_HAND)
+        start = rng.integers(0, T - 4); end = min(T, start + rng.integers(4, 16))
+        pts[start:end, hand] = pts[max(start - 1, 0), hand]
+        pres[start:end, side] = 0
+    return pts, pres
 
 
 class SenasDataset(Dataset):
@@ -108,5 +132,5 @@ class SenasDataset(Dataset):
     def __getitem__(self, i):
         x = self.X[i]
         if self.aug:
-            x = aumentar(x, self.rng)
+            x = aumentar(x, self.rng, webcam=self.aug == "webcam")
         return torch.from_numpy(np.ascontiguousarray(x)), int(self.y[i])

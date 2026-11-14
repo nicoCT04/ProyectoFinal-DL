@@ -61,6 +61,9 @@ ITERACIONES = {
                                init="pre_tf", lr_backbone=1e-4, paciencia=60),
     "it6_tl_lstm_finetune": dict(arq="lstm", aug=True, ls=0.1, epochs=200, lr=1e-3,
                                  init="pre_lstm", lr_backbone=3e-4, paciencia=60),
+    # ---- v3: v2 + aumentos que imitan la cámara en vivo (grabación cortada, encuadre, mano perdida)
+    "it7_tl_tf_webcam": dict(arq="transformer", aug="webcam", ls=0.1, epochs=200, lr=5e-4, wd=0.05,
+                             init="pre_tf", lr_backbone=1e-4, paciencia=60),
 }
 # Curva de aprendizaje (valor vs. cantidad de datos) para v1 y v2.
 for _f in [0.25, 0.5, 0.75]:
