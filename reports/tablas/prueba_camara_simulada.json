@@ -1,0 +1,54 @@
+{
+  "videos": 616,
+  "grabaciones": 601,
+  "senas_sin_grabacion": 24,
+  "senas_partidas": 9,
+  "modelos": {
+    "v0": {
+      "archivo": "it0_lstm_base_s2",
+      "top1": 0.6022727272727273,
+      "top3": 0.814935064935065,
+      "top1_n": 371,
+      "top3_n": 502
+    },
+    "v1": {
+      "archivo": "it2_tf_aug_s0",
+      "top1": 0.814935064935065,
+      "top3": 0.9025974025974026,
+      "top1_n": 502,
+      "top3_n": 556
+    },
+    "v2": {
+      "archivo": "it7_tl_tf_webcam_s1",
+      "top1": 0.8441558441558441,
+      "top3": 0.9301948051948052,
+      "top1_n": 520,
+      "top3_n": 573
+    }
+  },
+  "fecha": "2026-11-14",
+  "detector_ms_por_cuadro": 35,
+  "ajuste_segmentacion_60_videos": {
+    "nota": "v2 anterior (it5_tl_tf_finetune_s2) en 60 videos, antes y después de bajar minConManos de 15 a 8",
+    "antes": {
+      "top1_n": 44,
+      "top3_n": 48,
+      "senas_sin_grabacion": 5
+    },
+    "despues": {
+      "top1_n": 52,
+      "top3_n": 58,
+      "senas_sin_grabacion": 1
+    },
+    "cuadro_por_cuadro": {
+      "top1_n": 52,
+      "top3_n": 55
+    }
+  },
+  "v2_anterior_it5_s2": {
+    "top1_n": 517,
+    "top3_n": 567,
+    "top1": 0.8392857142857143,
+    "top3": 0.9204545454545454
+  }
+}
