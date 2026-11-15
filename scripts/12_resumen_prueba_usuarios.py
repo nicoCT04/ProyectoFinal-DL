@@ -5,7 +5,7 @@ modelo de valor y en tablas anónimas (sin nombres, solo P1, P2…).
   modo usuarios -> reports/tablas/prueba_usuarios.json + docs/RESULTADOS_PRUEBA_USUARIOS.md
   modo propia   -> reports/tablas/validacion_propia.json
 
-Uso:  python scripts/12_resumen_prueba_usuarios.py [--excluir P3 P5]
+Uso:  python scripts/12_resumen_prueba_usuarios.py [--excluir P3 P5] [--excluir-ensayos P1:manual]
 """
 import argparse
 import json
@@ -54,7 +54,7 @@ def users_summary(ev: pd.DataFrame) -> dict:
             t_manual=median(man.t_s.clip(upper=LIMIT_S)),
             p_manual=float(man.encontrada.mean()) if len(man) else None,
             t_rev3=median(safe.ms_hasta_elegir / 1000),
-            t_grabar=median(app.t_primer_resultado_s)),
+            t_grabar=median(app.t_ultimo_resultado_s)),
     )
     if len(sv):
         scales = ["facil_manual", "facil_app", "confianza", "usaria"]
@@ -90,7 +90,7 @@ def write_markdown(s: dict, path: Path):
         "# Resultados de la prueba con usuarios",
         "",
         f"Generado por `scripts/12_resumen_prueba_usuarios.py` a partir de la sesión guiada de la app "
-        f"(`/?prueba=usuarios`). {s['participantes']} participantes, {s['ensayos_manual']} búsquedas manuales "
+        f"(`/?prueba=usuarios`). {s['participantes']} sesiones (P1, P2…), {s['ensayos_manual']} búsquedas manuales "
         f"y {s['ensayos_app']} con SeñaBusca. Datos anónimos (P1, P2…); los registros crudos no se publican.",
         "",
         "| Métrica | Búsqueda manual (tarea A) | SeñaBusca (tarea B) |",
@@ -108,7 +108,7 @@ def write_markdown(s: dict, path: Path):
         f"| `t_manual` | {fmt(sm['t_manual'], 0)} s | mediana del tiempo de la tarea A (tope {LIMIT_S} s) |",
         f"| `p_manual` | {fmt(sm['p_manual'], 2)} | fracción de la tarea A con la respuesta correcta |",
         f"| `t_rev3` | {fmt(sm['t_rev3'], 1)} s | mediana de `ms_hasta_elegir` en modo seguro |",
-        f"| `t_grabar` | {fmt(sm['t_grabar'], 1)} s | mediana desde «Listo» hasta el primer resultado |",
+        f"| `t_grabar` | {fmt(sm['t_grabar'], 1)} s | mediana desde «Listo» hasta el último resultado (incluye reintentos) |",
     ]
     if "encuesta" in s:
         e = s["encuesta"]
@@ -126,6 +126,7 @@ def write_markdown(s: dict, path: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--excluir", nargs="*", default=[])
+    ap.add_argument("--excluir-ensayos", nargs="*", default=[], help="participante:tarea o participante:encuesta, p. ej. P1:manual")
     args = ap.parse_args()
     if not LOG.exists():
         raise SystemExit(f"No existe {LOG}: corre la sesión en /?prueba=usuarios o /?prueba=propia")
@@ -134,6 +135,9 @@ def main():
     for col in ["tarea", "rank_elegido", "modo_app", "glosa_elegida", "top3", "comentario"]:
         if col not in ev:
             ev[col] = None
+    for item in args.excluir_ensayos:
+        who, task = item.split(":")
+        ev = ev[~((ev.participante == who) & ((ev.tarea == task) | (ev.tipo == task)))]
     TABLES.mkdir(parents=True, exist_ok=True)
     users = ev[ev.modo == "usuarios"]
     if (users.tipo == "ensayo").any():

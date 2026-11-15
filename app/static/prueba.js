@@ -5,7 +5,7 @@
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const MODE = params.get("prueba") === "propia" ? "propia" : "usuarios";
-const USER_SIGNS = ["HELLO", "THANKYOU", "SCHOOL", "UNDERSTAND", "BATHROOM", "TOMORROW"];
+const USER_SIGNS = (params.get("senas") || "HELLO,THANKYOU,SCHOOL,UNDERSTAND,BATHROOM,TOMORROW").split(",");
 const LIMIT_S = 300;
 
 let info, participant, trials = [], current = -1, trial = null, timer = null;
@@ -95,8 +95,9 @@ function nextTrial() {
 // ---------------------------------------------------------------- tarea A
 function manualIntro() {
   render(`${header()}${videoTag(trial.gloss, trial.video)}
-    <p>Mira esta seña. Búscala en el diccionario en línea que quieras, en otra pestaña (por ejemplo
-       <b>handspeak.com</b>, <b>lifeprint.com</b> o <b>signasl.org</b>). Tienes ${LIMIT_S / 60} minutos.</p>
+    <p>Mira esta seña. <b>No la hagas frente a la cámara</b>: averigua qué significa buscándola en un
+       diccionario en línea, en otra pestaña (por ejemplo <b>handspeak.com</b>, <b>lifeprint.com</b> o
+       <b>signasl.org</b>), como lo harías sin SeñaBusca. Tienes ${LIMIT_S / 60} minutos.</p>
     <button class="primario" id="pruebaIr">Empezar a buscar</button>`);
   $("pruebaIr").onclick = () => {
     trial.t0 = performance.now();

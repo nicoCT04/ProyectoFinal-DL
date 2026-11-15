@@ -347,4 +347,4 @@ function seg(c, p, q) { c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]
 function setEstado(cls, txt) { const e = $("estado"); e.className = "estado " + cls; e.textContent = txt; }
 
 init().catch(err => setEstado("espera", "Error al iniciar: " + err));
-if (new URLSearchParams(location.search).has("prueba")) import("/static/prueba.js?v=3");
+if (new URLSearchParams(location.search).has("prueba")) import("/static/prueba.js?v=4");
