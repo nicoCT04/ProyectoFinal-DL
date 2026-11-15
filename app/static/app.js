@@ -274,8 +274,8 @@ function pintarTarjetas(k) {
         <div class="prob">${(c.prob * 100).toFixed(1)} %</div></div>
        <button>Es esta</button>`;
     d.querySelector("button").onclick = () => enviarFeedback(c.glosa, i);
-    const cv = d.querySelector("canvas"); if (cv) animarEjemplo(cv, c.glosa);
     cont.appendChild(d);
+    const cv = d.querySelector("canvas"); if (cv) animarEjemplo(cv, c.glosa);
   });
 }
 $("btnMas").onclick = () => { pintarTarjetas(10); $("btnMas").classList.add("oculto"); };
