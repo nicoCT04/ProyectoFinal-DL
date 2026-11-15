@@ -326,17 +326,19 @@ async function animarEjemplo(cv, glosa) {
   }
   if (!fr) { cv.style.display = "none"; return; }
   const c = cv.getContext("2d"), W = cv.width, H = cv.height;
+  const css = getComputedStyle(document.documentElement);
+  const colorPose = css.getPropertyValue("--suave").trim(), colorMano = css.getPropertyValue("--acento").trim();
   const P = (p) => [W / 2 - p[0] * W * 0.23, H * 0.58 + p[1] * W * 0.23];   // en espejo, como la cámara
   const POSE = [[5,6],[5,7],[7,9],[6,8],[8,10]];
   let t = 0;
   const paso = () => {
     if (!cv.isConnected) return;
     const f = fr[Math.floor(t) % fr.length];
-    c.clearRect(0, 0, W, H); c.lineWidth = 2;
-    c.strokeStyle = "#888";
+    c.clearRect(0, 0, W, H); c.lineWidth = 2.5;
+    c.strokeStyle = colorPose;
     for (const [a, b] of POSE) seg(c, P(f[a]), P(f[b]));
     c.beginPath(); const n = P(f[0]); c.arc(n[0], n[1], W * 0.05, 0, 7); c.stroke();
-    c.strokeStyle = "#2f5bd3";
+    c.strokeStyle = colorMano;
     for (const off of [11, 32]) for (const [a, b] of MANO) seg(c, P(f[off + a]), P(f[off + b]));
     t += 0.5; requestAnimationFrame(paso);
   };
