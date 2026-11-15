@@ -245,6 +245,13 @@ def main():
             "estudiantes es el siguiente paso, y el análisis de sensibilidad muestra que la conclusión no depende de estos valores. "
             "No pagaría por la app como estudiante, lo que confirma que el cliente es la institución (curso o programa de ASL) que "
             "valora el tiempo de sus estudiantes, no el estudiante individual.")
+    if (TAB / "validacion_propia.json").exists() and "frase_usuarios" in N:
+        vp = json.loads((TAB / "validacion_propia.json").read_text())
+        N["frase_usuarios"] += (
+            f" Además, en una validación propia con {vp['ensayos']} señas del vocabulario aprendidas en el momento con el video de "
+            f"ejemplo (/?prueba=propia), la app acertó en la primera opción el {vp['top1_primer_intento'] * 100:.0f} % de las veces al "
+            f"primer intento ({vp['top3_primer_intento'] * 100:.0f} % dentro de las 3 mostradas) y el {vp['top1_ultimo_intento'] * 100:.0f} % "
+            f"tras repetir la seña ({vp['intentos_promedio']:.2f} intentos en promedio).")
     if (TAB / "prueba_camara_simulada.json").exists():
         cs = json.loads((TAB / "prueba_camara_simulada.json").read_text())
         mm, aj = cs["modelos"], cs["ajuste_segmentacion_60_videos"]

@@ -67,8 +67,23 @@ def users_summary(ev: pd.DataFrame) -> dict:
     return out
 
 
+def first_attempts(ev: pd.DataFrame) -> list:
+    """Top-3 del primer intento de cada ensayo, a partir de logs/segmentacion.jsonl (requiere ?debug=1)."""
+    seg_path = ROOT / "logs" / "segmentacion.jsonl"
+    if not seg_path.exists():
+        return []
+    sent = [e for e in (json.loads(l) for l in seg_path.read_text().splitlines() if l.strip()) if e["ev"] == "enviada"]
+    out, prev = [], ev[ev.tipo == "inicio"].ts.min()
+    for _, t in ev[ev.tipo == "ensayo"].sort_values("ts").iterrows():
+        att = [s for s in sent if prev < s["ts"] <= t.ts]
+        prev = t.ts
+        out.append((t.glosa, att[0]["top3"] if att else []))
+    return out
+
+
 def own_summary(ev: pd.DataFrame) -> dict:
     app = ev[(ev.tipo == "ensayo") & (ev.tarea == "app")]
+    first = first_attempts(ev)
     shown = app.top3.apply(lambda t: t if isinstance(t, list) else [])
     top1 = [bool(t) and t[0] == g for t, g in zip(shown, app.glosa)]
     top3 = [g in t for t, g in zip(shown, app.glosa)]
@@ -77,6 +92,8 @@ def own_summary(ev: pd.DataFrame) -> dict:
                 eligio_correcta=float(app.correcta.mean()) if len(app) else None,
                 intentos_promedio=float(app.intentos.mean()) if len(app) else None,
                 t_total_mediana_s=median(app.t_s),
+                top1_primer_intento=float(np.mean([bool(t) and t[0] == g for g, t in first])) if first else None,
+                top3_primer_intento=float(np.mean([g in t for g, t in first])) if first else None,
                 fallos=[dict(glosa=g, top3=t) for g, t, ok in zip(app.glosa, shown, top3) if not ok])
 
 
