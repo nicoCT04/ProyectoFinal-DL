@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SeñaBusca: explicación del modelo y guion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Documento de estudio: índice fijo a la izquierda en escritorio, texto de lectura a 68 caracteres, guion al final por diapositiva. */
+:root {
+  --bg: #f7f7f4;
+  --panel: #ffffff;
+  --ink: #1b1d22;
+  --muted: #5d6270;
+  --line: #e1e2dc;
+  --accent: #2f5bd3;
+  --accent-soft: #e7ecfa;
+  --est: #b4690e;
+  --est-soft: #fbf0e0;
+  --nico: #1f8a4c;
+  --nico-soft: #e3f4ea;
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-body: "Source Serif 4", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15161a; --panel: #1d1f24; --ink: #e9eaee; --muted: #a3a8b5; --line: #30333b;
+    --accent: #8aa6ff; --accent-soft: #232c45; --est: #f0b25c; --est-soft: #362a19;
+    --nico: #6fd39a; --nico-soft: #1c3226; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15161a; --panel: #1d1f24; --ink: #e9eaee; --muted: #a3a8b5; --line: #30333b;
+  --accent: #8aa6ff; --accent-soft: #232c45; --est: #f0b25c; --est-soft: #362a19;
+  --nico: #6fd39a; --nico-soft: #1c3226; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 18px; line-height: 1.6; }
+.wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 48px; max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; gap: 24px; padding: 24px 16px 64px; } nav.toc { position: static !important; max-height: none !important; } }
+nav.toc { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow: auto; font-family: var(--font-display); font-size: 14px; }
+nav.toc strong { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+nav.toc a { display: block; color: var(--ink); text-decoration: none; padding: 3px 0; border-left: 2px solid transparent; padding-left: 10px; }
+nav.toc a:hover, nav.toc a:focus-visible { border-left-color: var(--accent); color: var(--accent); outline: none; }
+main { min-width: 0; }
+header.top { margin-bottom: 32px; }
+header.top .kicker { font-family: var(--font-display); font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.2; }
+h1 { font-size: 40px; margin: 8px 0 12px; letter-spacing: -0.5px; }
+h2 { font-size: 27px; margin: 56px 0 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+h3 { font-size: 20px; margin: 30px 0 8px; }
+p, li { max-width: 68ch; }
+.lead { font-size: 20px; color: var(--muted); }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; margin: 18px 0; max-width: 72ch; }
+.box.key { border-left: 4px solid var(--accent); }
+.box h4 { font-family: var(--font-display); margin: 0 0 6px; font-size: 15px; }
+.formula { font-family: var(--font-mono); font-size: 15px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; overflow-x: auto; max-width: 72ch; white-space: pre; }
+.tablewrap { overflow-x: auto; max-width: 100%; margin: 16px 0; }
+table { border-collapse: collapse; font-size: 15px; font-family: var(--font-display); background: var(--panel); min-width: 560px; }
+th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: var(--accent-soft); font-weight: 700; }
+td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.hl td { background: var(--accent-soft); font-weight: 700; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 20px 0; max-width: 820px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 28px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 14px; color: var(--muted); font-family: var(--font-display); }
+figure { margin: 22px 0; max-width: 820px; }
+figure svg { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+figcaption { font-size: 14px; color: var(--muted); font-family: var(--font-display); margin-top: 6px; }
+.svgtext { fill: var(--ink); font-family: "Manrope", sans-serif; }
+.svgmuted { fill: var(--muted); font-family: "Manrope", sans-serif; }
+.svgbox { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+.svgacc { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.svgline { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--font-display); font-size: 14px; margin: 12px 0 4px; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-family: var(--font-display); font-size: 13px; font-weight: 700; }
+.pill.est { background: var(--est-soft); color: var(--est); }
+.pill.nico { background: var(--nico-soft); color: var(--nico); }
+.slide { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; margin: 18px 0; max-width: 820px; }
+.slide .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-display); }
+.slide .head h3 { margin: 0; font-size: 19px; }
+.slide .time { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.slide .say { border-left: 3px solid var(--line); padding-left: 14px; margin: 12px 0 6px; }
+.slide.est .say { border-left-color: var(--est); }
+.slide.nico .say { border-left-color: var(--nico); }
+.slide .tip { font-size: 15px; color: var(--muted); font-family: var(--font-display); }
+details.qa { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 8px 0; max-width: 72ch; }
+.qa-q { font-family: var(--font-display); font-weight: 700; margin: 0; }
+.qa-a { margin: 6px 0 0; }
+.qa-item { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 10px 0; max-width: 72ch; }
+footer.end { margin-top: 56px; font-size: 14px; color: var(--muted); font-family: var(--font-display); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc" aria-label="Índice">
+  <strong>Parte 1 · Entender el proyecto</strong>
+  <a href="#problema">1. El problema</a>
+  <a href="#solucion">2. La solución en una frase</a>
+  <a href="#datos">3. Los datos</a>
+  <a href="#representacion">4. De video a tensor</a>
+  <a href="#base">5. Línea base sin deep learning</a>
+  <a href="#lstm">6. v0: LSTM bidireccional</a>
+  <a href="#transformer">7. v1: Transformer encoder</a>
+  <a href="#entrenamiento">8. Cómo entrenamos</a>
+  <a href="#tl">9. v2: transfer learning</a>
+  <a href="#iteraciones">10. Iteraciones y qué enseñó cada una</a>
+  <a href="#producto">11. Lo que solo vimos en el producto</a>
+  <a href="#evaluacion">12. Evaluación y explicabilidad</a>
+  <a href="#valor">13. Del modelo al valor</a>
+  <a href="#curso">14. Mapa con el curso</a>
+  <strong>Parte 2 · Presentación</strong>
+  <a href="#guion">15. Guion de 5 minutos</a>
+  <a href="#preguntas">16. Preguntas probables</a>
+  <a href="#numeros">17. Números para memorizar</a>
+</nav>
+
+<main>
+<header class="top">
+  <div class="kicker">CC3092 Deep Learning · Proyecto final</div>
+  <h1>SeñaBusca: cómo funciona el modelo, por qué, y qué decir en 5 minutos</h1>
+  <p class="lead">Documento de estudio para Esteban y Nicolás. La primera parte explica el proyecto de punta a punta con el foco en el modelo y su relación con el curso; la segunda es el guion amarrado a las 8 diapositivas, con quién dice qué.</p>
+</header>
+
+<!-- ======================================================== PARTE 1 -->
+<h2 id="problema">1. El problema</h2>
+<p>Quien aprende lengua de señas americana (ASL) se topa con señas que no conoce: en clase, en un video o hablando con una persona sorda. Los diccionarios en línea (Handspeak, Lifeprint, SignASL) están organizados por palabra en inglés: sirven para ir de <em>palabra → seña</em>, pero no de <em>seña → palabra</em>. Para buscar una seña desconocida hay que navegar por forma de la mano o ubicación, adivinar palabras, o preguntarle al docente.</p>
+<p>Lo medimos en una prueba piloto con la propia app (un integrante del equipo, con señas que no conocía):</p>
+<div class="stats">
+  <div class="stat"><b>274 s</b><span>mediana para buscar una seña a mano</span></div>
+  <div class="stat"><b>0 de 3</b><span>señas encontradas a mano</span></div>
+  <div class="stat"><b>10 s</b><span>mediana con SeñaBusca</span></div>
+  <div class="stat"><b>6 de 6</b><span>resueltas con la app, en la 1.ª opción</span></div>
+</div>
+<p>El usuario es el estudiante de un curso o programa de ASL; quien pagaría es la institución, que valora el tiempo de sus estudiantes (el estudiante, en la encuesta, dijo que no pagaría por su cuenta).</p>
+
+<h2 id="solucion">2. La solución en una frase</h2>
+<div class="box key"><p style="margin:0">Un <b>clasificador de secuencias</b>: la cámara se convierte en una secuencia de puntos clave del cuerpo y las manos; un <b>Transformer</b> que entrenamos nosotros (con <b>transfer learning</b> propio) asigna una probabilidad a cada una de las 50 señas; la app muestra las 3 más probables y, si la confianza es baja, lo dice.</p></div>
+<p>Importante para el catedrático: <b>no es un caso de uso de un LLM</b>. El modelo lo diseñamos, entrenamos y evaluamos nosotros. La única pieza preentrenada de terceros es MediaPipe, que usamos como extractor fijo de puntos clave (no aprende nada en nuestro proyecto), igual que se usaría un detector para recortar una imagen. El transfer learning sí es nuestro: preentrenamos nuestro propio Transformer con otras 450 señas.</p>
+<figure>
+  <svg viewBox="0 0 820 170" role="img" aria-label="Flujo: cámara, MediaPipe, tensor 64 por 161, Transformer, softmax, top-3 y umbral">
+    <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a8f98"/></marker></defs>
+    <g>
+      <rect class="svgbox" x="12" y="45" width="110" height="70" rx="10"/><text class="svgtext" x="67" y="77" text-anchor="middle" font-size="14" font-weight="700">Cámara</text><text class="svgmuted" x="67" y="96" text-anchor="middle" font-size="12">30 fps</text>
+      <rect class="svgbox" x="150" y="45" width="130" height="70" rx="10"/><text class="svgtext" x="215" y="77" text-anchor="middle" font-size="14" font-weight="700">MediaPipe</text><text class="svgmuted" x="215" y="96" text-anchor="middle" font-size="12">53 puntos/cuadro</text>
+      <rect class="svgbox" x="308" y="45" width="130" height="70" rx="10"/><text class="svgtext" x="373" y="77" text-anchor="middle" font-size="14" font-weight="700">Preprocesar</text><text class="svgmuted" x="373" y="96" text-anchor="middle" font-size="12">tensor 64 × 161</text>
+      <rect class="svgacc" x="466" y="35" width="150" height="90" rx="10"/><text class="svgtext" x="541" y="72" text-anchor="middle" font-size="15" font-weight="800">Transformer</text><text class="svgmuted" x="541" y="92" text-anchor="middle" font-size="12">nuestro modelo</text>
+      <rect class="svgbox" x="644" y="45" width="164" height="70" rx="10"/><text class="svgtext" x="726" y="77" text-anchor="middle" font-size="14" font-weight="700">Top-3 + confianza</text><text class="svgmuted" x="726" y="96" text-anchor="middle" font-size="12">umbral τ = 0.67</text>
+      <path class="svgline" d="M122 80 H148" marker-end="url(#ar)"/><path class="svgline" d="M280 80 H306" marker-end="url(#ar)"/><path class="svgline" d="M438 80 H464" marker-end="url(#ar)"/><path class="svgline" d="M616 80 H642" marker-end="url(#ar)"/>
+      <text class="svgmuted" x="215" y="148" text-anchor="middle" font-size="12">en el navegador: el video no sale del equipo</text>
+      <text class="svgmuted" x="541" y="148" text-anchor="middle" font-size="12">≈ 2 ms por seña en CPU</text>
+    </g>
+  </svg>
+  <figcaption>Figura 1. El flujo completo. La parte de deep learning es el Transformer (y sus versiones anteriores).</figcaption>
+</figure>
+
+<h2 id="datos">3. Los datos</h2>
+<p><b>ASL Citizen</b> (Microsoft Research, 2023): 83 399 videos de webcam de 2 731 señas, grabados por 52 personas sordas o con discapacidad auditiva, en sus casas (luz, fondo y cámara variados, como en el uso real).</p>
+<ul>
+  <li><b>Vocabulario objetivo:</b> 50 señas cotidianas de un estudiante (HELLO, THANKYOU, MOTHER, SCHOOL, BATHROOM…), 1 538 videos, ≈ 30 por seña: clases balanceadas, por eso accuracy y F1 macro casi coinciden.</li>
+  <li><b>Para el transfer learning:</b> otras 450 señas al azar (13 767 videos) que nunca se usan para evaluar las 50.</li>
+  <li><b>División por persona</b> (la oficial del dataset): 732 videos de entrenamiento, 190 de validación y 616 de prueba, de <b>11 personas que el modelo nunca vio</b>. Esto imita el uso real (el usuario nunca está en el entrenamiento) y evita la fuga más común en este tipo de datos: aprender a reconocer a la persona en vez de la seña.</li>
+  <li><b>Licencia:</b> uso de investigación no comercial. No publicamos videos ni puntos derivados; el repositorio dice cómo descargarlos.</li>
+</ul>
+
+<h2 id="representacion">4. De video a tensor (la entrada del modelo)</h2>
+<h3>¿Por qué puntos clave y no píxeles?</h3>
+<p>Una red sobre píxeles (CNN 3D o CNN + RNN) tendría que aprender sola a ignorar el fondo, la ropa, la luz y el tono de piel, con solo ≈ 15 videos por seña y persona de entrenamiento. Con puntos clave el modelo ve directamente lo que define una seña: <b>la forma y la trayectoria de las manos respecto al cuerpo</b>. Ventajas: entrena en minutos en una laptop, es invariante al fondo e iluminación, y en la app el video nunca sale del navegador. Desventaja honesta: si MediaPipe no ve la mano, el modelo tampoco.</p>
+<h3>Los cuatro pasos</h3>
+<ol>
+  <li><b>Extracción (MediaPipe).</b> Por cuadro: 11 puntos del torso y la cara (nariz, ojos, boca, hombros, codos, muñecas) y 21 por cada mano = <b>53 puntos × (x, y, z)</b>. Las manos se asignan a izquierda/derecha por cercanía a las muñecas de la pose, no con la etiqueta de MediaPipe, para que dé igual con la cámara reflejada.</li>
+  <li><b>Recorte</b> de los cuadros de reposo antes y después de la seña (sin manos).</li>
+  <li><b>Normalización:</b> se resta el punto medio de los hombros y se divide por el ancho de hombros. Así da igual dónde está la persona en la imagen y a qué distancia de la cámara (es la misma idea que estandarizar las variables de entrada).</li>
+  <li><b>Remuestreo a 64 cuadros</b> por interpolación lineal (las señas duran distinto: mediana 71 cuadros ≈ 2.4 s), y dos columnas de presencia de mano (1 si se detectó la mano izquierda/derecha en ese cuadro).</li>
+</ol>
+<div class="formula">entrada por seña = 64 cuadros × (53 puntos × 3 coordenadas + 2 indicadores) = 64 × 161</div>
+<p>El mismo código (<code>asl/features.py</code>) prepara los datos de entrenamiento y los de la app. Esa decisión importa mucho (sección 11).</p>
+
+<h2 id="base">5. Línea base sin deep learning</h2>
+<p>Antes de cualquier red, probamos lo más simple: calcular estadísticos de cada coordenada a lo largo del tiempo (media, desviación, mínimo, máximo…) y entrenar una <b>regresión logística</b> y un <b>k-NN</b>. La regresión logística llega a <b>61.7 % de top-1 y 79.9 % de top-3</b>. Es la respuesta a "¿por qué deep learning?": al resumir la seña en estadísticos se pierde el <em>orden</em> temporal (el movimiento), y una seña es justamente un movimiento. El mejor modelo de deep learning baja el error top-3 de 20.1 % a 1.9 %, y en el modelo de valor eso son ≈ 1,400 USD/mes adicionales.</p>
+
+<h2 id="lstm">6. v0: LSTM bidireccional (RNN del curso)</h2>
+<p>Primer modelo de deep learning, como en el laboratorio de RNN/LSTM:</p>
+<ul>
+  <li>Cada cuadro (161 números) pasa por una capa lineal a 192 dimensiones + LayerNorm + GELU (un "embedding" del cuadro).</li>
+  <li><b>LSTM de 2 capas, 192 unidades, bidireccional:</b> lee la secuencia hacia adelante y hacia atrás. La LSTM mantiene una memoria (estado de celda) controlada por compuertas de entrada, olvido y salida, lo que mitiga el desvanecimiento del gradiente de una RNN simple.</li>
+  <li><b>Many-to-one:</b> se promedian las 64 salidas en el tiempo y una capa lineal da 50 logits. 1.53 M de parámetros.</li>
+</ul>
+<p><b>Qué pasó:</b> sobreajuste severo. Sin aumentos llega a 0.999 de top-1 en entrenamiento y solo <b>0.689 en prueba</b> (la pérdida de entrenamiento cae a ≈ 0 en ~60 epochs mientras la de validación sube). Con aumentos de datos y label smoothing (sección 8) sube a <b>0.813</b>. Es el ejemplo clásico de varianza alta con pocos datos.</p>
+
+<h2 id="transformer">7. v1: Transformer encoder (atención del curso)</h2>
+<p>Es el corazón del proyecto. Es un Transformer de solo encoder, como BERT o ViT, aplicado a la secuencia de cuadros:</p>
+<figure>
+  <svg viewBox="0 0 820 300" role="img" aria-label="Arquitectura del Transformer: cuadros, proyección lineal, token CLS, embeddings posicionales, 4 bloques encoder, CLS, lineal, softmax">
+    <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8a8f98"/></marker></defs>
+    <rect class="svgbox" x="14" y="110" width="120" height="80" rx="10"/><text class="svgtext" x="74" y="143" text-anchor="middle" font-size="13" font-weight="700">64 cuadros</text><text class="svgmuted" x="74" y="162" text-anchor="middle" font-size="12">× 161</text>
+    <rect class="svgbox" x="160" y="110" width="130" height="80" rx="10"/><text class="svgtext" x="225" y="138" text-anchor="middle" font-size="13" font-weight="700">Lineal → 192</text><text class="svgmuted" x="225" y="156" text-anchor="middle" font-size="12">LayerNorm · GELU</text><text class="svgmuted" x="225" y="173" text-anchor="middle" font-size="12">dropout 0.2</text>
+    <rect class="svgbox" x="316" y="110" width="140" height="80" rx="10"/><text class="svgtext" x="386" y="138" text-anchor="middle" font-size="13" font-weight="700">+ token [CLS]</text><text class="svgmuted" x="386" y="156" text-anchor="middle" font-size="12">+ posiciones</text><text class="svgmuted" x="386" y="173" text-anchor="middle" font-size="12">aprendidas (65)</text>
+    <rect class="svgacc" x="482" y="40" width="170" height="220" rx="12"/>
+    <text class="svgtext" x="567" y="66" text-anchor="middle" font-size="14" font-weight="800">Bloque encoder × 4</text>
+    <rect class="svgbox" x="498" y="82" width="138" height="48" rx="8"/><text class="svgtext" x="567" y="103" text-anchor="middle" font-size="12" font-weight="700">LayerNorm +</text><text class="svgtext" x="567" y="120" text-anchor="middle" font-size="12" font-weight="700">autoatención (4 cabezas)</text>
+    <text class="svgmuted" x="567" y="146" text-anchor="middle" font-size="12">+ conexión residual</text>
+    <rect class="svgbox" x="498" y="158" width="138" height="48" rx="8"/><text class="svgtext" x="567" y="179" text-anchor="middle" font-size="12" font-weight="700">LayerNorm +</text><text class="svgtext" x="567" y="196" text-anchor="middle" font-size="12" font-weight="700">MLP 192→768→192</text>
+    <text class="svgmuted" x="567" y="224" text-anchor="middle" font-size="12">+ conexión residual</text>
+    <text class="svgmuted" x="567" y="246" text-anchor="middle" font-size="11">pre-norm · GELU · dropout</text>
+    <rect class="svgbox" x="678" y="110" width="128" height="80" rx="10"/><text class="svgtext" x="742" y="136" text-anchor="middle" font-size="13" font-weight="700">salida del [CLS]</text><text class="svgmuted" x="742" y="154" text-anchor="middle" font-size="12">Lineal → 50</text><text class="svgmuted" x="742" y="171" text-anchor="middle" font-size="12">softmax</text>
+    <path class="svgline" d="M134 150 H158" marker-end="url(#ar2)"/><path class="svgline" d="M290 150 H314" marker-end="url(#ar2)"/><path class="svgline" d="M456 150 H480" marker-end="url(#ar2)"/><path class="svgline" d="M652 150 H676" marker-end="url(#ar2)"/>
+    <text class="svgmuted" x="410" y="284" text-anchor="middle" font-size="12">1.83 M parámetros · d = 192 · 4 cabezas de 48 dimensiones · secuencia de 65 posiciones</text>
+  </svg>
+  <figcaption>Figura 2. El Transformer de SeñaBusca (<code>asl/models.py</code>, clase <code>TransformerClasificador</code>).</figcaption>
+</figure>
+<h3>Paso a paso</h3>
+<ol>
+  <li><b>Embedding de cuadro:</b> igual que en la LSTM, cada cuadro se proyecta a d = 192.</li>
+  <li><b>Token [CLS]:</b> se antepone un vector aprendido. Al final, su salida resume toda la seña (como en BERT). Así la red decide qué cuadros pesan más, en lugar de promediar.</li>
+  <li><b>Embeddings posicionales aprendidos:</b> la autoatención no sabe el orden por sí sola (es invariante a permutaciones), así que se suma un vector distinto para cada una de las 65 posiciones. Sin esto, la seña de "ir" y la de "venir" (misma forma, movimiento inverso) serían iguales para el modelo.</li>
+  <li><b>4 bloques encoder</b> con la estructura pre-norm: <code>x + Atención(LN(x))</code> y luego <code>x + MLP(LN(x))</code>. Las conexiones residuales y LayerNorm permiten apilar capas sin problemas de gradiente.</li>
+  <li><b>Salida:</b> LayerNorm sobre el [CLS] y una capa lineal a 50 logits; softmax da probabilidades.</li>
+</ol>
+<h3>La autoatención, en concreto</h3>
+<p>Cada cuadro produce tres vectores: consulta (Q), clave (K) y valor (V). La atención de un cuadro hacia otro es el producto punto de su Q con la K del otro, escalado y normalizado con softmax; la nueva representación del cuadro es la suma de los V ponderada por esas atenciones:</p>
+<div class="formula">Atención(Q, K, V) = softmax( Q·Kᵀ / √d_k ) · V        con d_k = 192 / 4 = 48 por cabeza</div>
+<p>Con 4 cabezas, el modelo aprende 4 "formas de mirar" en paralelo (por ejemplo, una puede seguir la mano dominante y otra relacionar la mano con la cara).</p>
+<div class="box key"><h4>¿Por qué el Transformer gana a la LSTM aquí?</h4>
+<p style="margin:0">Una seña se define por la relación entre partes alejadas en el tiempo: la configuración inicial y la final, o el punto donde la mano toca la cara. En la LSTM esa información tiene que viajar paso a paso por toda la cadena recurrente; en la atención, <b>cualquier cuadro mira directamente a cualquier otro</b> en una sola capa. Además, el costo O(T²) de la atención es irrelevante con T = 65. Resultado: de 0.813 (LSTM con aumentos) a <b>0.895 de top-1</b> y 0.966 de top-3 con un número de parámetros parecido. Un Transformer más chico (3 capas, d = 128) da casi lo mismo: el límite está en los datos, no en la capacidad.</p></div>
+
+<h2 id="entrenamiento">8. Cómo entrenamos (y por qué cada decisión)</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Decisión</th><th>Qué es</th><th>Por qué</th></tr></thead>
+<tbody>
+<tr><td>Pérdida</td><td>Entropía cruzada sobre 50 clases con <b>label smoothing 0.1</b> (el objetivo es 0.9 para la clase correcta y el resto repartido)</td><td>La app usa la distribución completa: la suma de probabilidades del top-3 decide si se muestra "seguro" o "no estoy seguro". El smoothing evita probabilidades sobreconfiadas (deja al modelo algo subconfiado, lo que es más seguro).</td></tr>
+<tr><td>Optimizador</td><td><b>AdamW</b>, lr 5·10⁻⁴, weight decay 0.05 (desacoplado), lotes de 64</td><td>Adam adapta el paso por parámetro; el weight decay desacoplado regulariza bien a los Transformers.</td></tr>
+<tr><td>Tasa de aprendizaje</td><td>Calentamiento lineal 5 epochs + decaimiento coseno</td><td>Los Transformers son inestables al inicio con lr alto (la atención y LayerNorm aún no están calibrados).</td></tr>
+<tr><td>Regularización</td><td>Dropout 0.2, recorte de gradiente a 1.0, early stopping por paciencia</td><td>Pocos datos: el riesgo principal es sobreajustar.</td></tr>
+<tr><td>Aumentos de datos</td><td>Espejo (intercambia manos y lados del cuerpo), rotación ±15°, escala ±15 %, traslación, deformación temporal, jitter, cuadros perdidos</td><td>Simulan personas zurdas, otras cámaras, otras velocidades y fallas del detector. Fue el cambio más rentable dentro de la LSTM (0.689 → 0.813).</td></tr>
+<tr><td>Selección</td><td>Mejor epoch por top-1 de <b>validación</b>; prueba se evalúa una sola vez</td><td>Prueba es intocable: así el número reportado no está sobreajustado a ella.</td></tr>
+<tr><td>Semillas</td><td>Cada iteración con 3 semillas; se reporta media ± desviación</td><td>Con 616 videos de prueba, diferencias de 1 punto pueden ser ruido.</td></tr>
+</tbody></table></div>
+<p>Costo: un Transformer desde cero tarda ≈ 3.6 min por semilla en una laptop con GPU; el preentrenamiento ≈ 4.3 min; el fine-tuning menos de 1 min. Lo más caro es extraer los puntos de 15 300 videos (≈ 1 h de CPU).</p>
+
+<h2 id="tl">9. v2: transfer learning (la excepción que pidió el catedrático)</h2>
+<p>La idea es la del laboratorio de transfer learning, pero con un modelo preentrenado <b>por nosotros</b>:</p>
+<ol>
+  <li><b>Preentrenamiento:</b> el mismo Transformer se entrena para clasificar <b>450 señas distintas</b> de las 50 (6 615 videos, solo de personas de entrenamiento). Llega a 0.867 de top-1 en validación sobre 450 clases. Ahí aprende "cómo se mueven las manos en ASL" en general: formas, trayectorias, ubicaciones.</li>
+  <li><b>Ajuste a las 50 señas:</b> se copian todos los pesos menos la cabeza (que pasa de 450 a 50 salidas, nueva). Dos variantes:
+    <ul><li><b>Congelado</b> (it4): solo se entrena la cabeza. 0.886 de top-1.</li>
+        <li><b>Fine-tuning completo</b> (it5): se entrena todo, con una tasa de aprendizaje <b>5 veces menor en el backbone</b> (1·10⁻⁴) que en la cabeza (5·10⁻⁴), para no destruir lo aprendido. 0.899 de top-1 y 0.972 de top-3.</li></ul></li>
+</ol>
+<div class="box key"><h4>Comparación contra el modelo base (lo que exige la restricción)</h4>
+<p style="margin:0">Misma arquitectura, desde cero (it2): 0.895 / 0.966. Con transfer learning (it5): 0.899 / 0.972, y converge en 3–4 veces menos epochs. Con 35 personas la ganancia es modesta, pero <b>con solo 9 personas de entrenamiento el modelo desde cero obtiene 0.775 de top-3 y el preentrenado 0.926</b>. Esa eficiencia en datos es lo que importa para crecer el vocabulario, donde cada seña nueva tendrá pocas grabaciones. No hay fuga: el preentrenamiento usa otras señas y solo personas de entrenamiento.</p></div>
+
+<h2 id="iteraciones">10. Iteraciones y qué enseñó cada una</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Iteración</th><th>Cambio</th><th>Top-1 prueba</th><th>Top-3 prueba</th><th>Lección</th></tr></thead>
+<tbody>
+<tr><td>Clásico</td><td>Regresión logística sobre estadísticos</td><td class="n">0.617</td><td class="n">0.799</td><td>Sin el orden temporal se pierde la seña</td></tr>
+<tr><td>it0 (v0)</td><td>LSTM bidireccional</td><td class="n">0.689</td><td class="n">0.870</td><td>Sobreajuste severo</td></tr>
+<tr><td>it1</td><td>+ aumentos y label smoothing</td><td class="n">0.813</td><td class="n">0.932</td><td>Los aumentos son el cambio más rentable en la LSTM</td></tr>
+<tr><td>it2 (v1)</td><td>Transformer + aumentos</td><td class="n">0.895</td><td class="n">0.966</td><td>La atención es el mayor salto</td></tr>
+<tr><td>it3</td><td>Transformer más chico</td><td class="n">0.880</td><td class="n">0.964</td><td>El límite son los datos</td></tr>
+<tr><td>it4</td><td>TL, backbone congelado</td><td class="n">0.886</td><td class="n">0.968</td><td>Las features preentrenadas ya sirven</td></tr>
+<tr><td>it5</td><td>TL, fine-tuning completo</td><td class="n">0.899</td><td class="n">0.972</td><td>Mejor con pocos datos</td></tr>
+<tr class="hl"><td>it7 (v2)</td><td>it5 + aumentos de cámara en vivo</td><td class="n">0.900</td><td class="n">0.977</td><td>Robusto a fallas reales de la cámara</td></tr>
+</tbody></table></div>
+<p>Valores = media de 3 semillas en prueba (11 personas no vistas). La semilla desplegada de it7 da 0.906 / 0.981.</p>
+
+<h2 id="producto">11. Lo que solo vimos al probar el producto</h2>
+<p>Esta es la mejor historia de "dominio técnico": tres problemas invisibles en el notebook que aparecieron al usar la app como lo haría una persona.</p>
+<h3>a) Desajuste entrenamiento ↔ producción (IMAGE vs VIDEO)</h3>
+<p>Extrajimos los puntos de entrenamiento con MediaPipe en modo IMAGE (cada cuadro por separado), pero el navegador usa modo VIDEO (sigue la mano entre cuadros, detecta más y tiembla ~4 veces menos). El modelo había aprendido de datos distintos a los que veía en la app: el Transformer bajaba de 0.887 a 0.837 de top-1 con datos como los de la app. Re-extrajimos los 15 300 videos en VIDEO y re-entrenamos: 0.895. En la app, de 50/60 a 57/60. Lección del curso: la distribución de entrenamiento y la de producción deben ser la misma.</p>
+<h3>b) La segmentación descartaba señas cortas</h3>
+<p>Pasamos los 616 videos de prueba por la app como si fueran una webcam en tiempo real. La grabación automática exigía 15 cuadros con mano activa y en el dataset el 4.3 % de las señas tiene menos (MOTHER, LIKE, HELLO son rápidas): esas señas nunca llegaban al modelo. Bajarlo a 8 subió la versión desplegada de 48/60 a 58/60 en top-3.</p>
+<h3>c) Cambio de dominio de la cámara → it7</h3>
+<p>Medimos qué fallas reales afectan al modelo aplicándolas a los puntos de prueba: si la segmentación corta el inicio de la seña, el top-3 de it5 cae de 0.972 a 0.912; si la cámara está muy cerca, a 0.942. La iteración <b>it7</b> repite el fine-tuning con aumentos que imitan esas fallas (recortar 0–40 % de un extremo, escala y traslación grandes, mano perdida varios cuadros seguidos). En prueba limpia no pierde nada (0.977) y en esos casos queda en 0.933 y 0.960. Es aumento de datos usado para cerrar un cambio de dominio. Se eligió por validación (0.986 de top-3, la mejor), no por prueba.</p>
+
+<h2 id="evaluacion">12. Evaluación y explicabilidad</h2>
+<ul>
+  <li><b>Métricas:</b> top-1, top-3 (la que importa: la app muestra 3 opciones) y F1 macro. Intervalos de confianza por bootstrap sobre personas (no sobre videos, porque los videos de una misma persona no son independientes).</li>
+  <li><b>En el producto:</b> con la cámara en tiempo real (616 videos) v2 acierta 84.4 % en la primera opción y 93.0 % en las tres; ≈ 5 puntos menos que offline, por la segmentación y la detección del navegador. Con señas aprendidas en el momento por nosotros: 65 % a la primera, 80 % en el top-3 y 100 % al repetir.</li>
+  <li><b>Oclusión:</b> si ocultamos las muñecas el top-3 cae de 0.981 a 0.494; la cara, a 0.578; la mano derecha, a 0.588. El modelo usa la trayectoria de las manos y <em>dónde</em> se hacen respecto al cuerpo (MOTHER se hace en la barbilla y FATHER en la frente, con la misma mano).</li>
+  <li><b>Saliencia por gradiente y atención del [CLS]:</b> se concentran en el centro de la seña y bajan en los cuadros de reposo.</li>
+  <li><b>Robustez:</b> con la seña reflejada (persona zurda) no cambia, gracias al aumento de espejo.</li>
+  <li><b>Errores:</b> BAD, WHO, SCHOOL, HOT son las más difíciles; las confusiones son entre señas con la misma forma o ubicación (PLEASE ↔ HAPPY, GOOD ↔ THANKYOU).</li>
+  <li><b>Calibración:</b> el modelo es subconfiado (efecto del label smoothing). Como el umbral se elige con datos de validación, la decisión no se afecta.</li>
+</ul>
+
+<h2 id="valor">13. Del modelo al valor (lo que pide la rúbrica)</h2>
+<p>Por búsqueda se compara el costo en segundos con y sin la app; las búsquedas que fallan o en las que el usuario se queda con un significado equivocado cuestan tiempo extra:</p>
+<div class="formula">sin app = t_manual + (1 − p_manual) · c_no_resuelta                  = 274 + 0.35 · 300 = 379 s
+con app = t_grabar + (t_rev3 si confianza ≥ τ, si no t_rev10) + costo de errores
+valor   = (sin app − con app) · búsquedas/mes · valor de la hora − costo de operación</div>
+<ul>
+  <li>Supuestos <b>medidos</b> en la prueba piloto: t_manual = 274 s, t_rev3 = 2.4 s, t_grabar = 7 s. p_manual se deja en 65 % (conservador) porque 3 búsquedas no bastan para estimarlo.</li>
+  <li><b>Umbral elegido por valor, no por métrica técnica:</b> τ maximiza el valor en validación. Al medir que revisar 3 opciones cuesta 2.4 s (no 15), conviene mostrarlas más y τ de v2 bajó de 0.83 a <b>0.67</b>.</li>
+  <li><b>Resultado:</b> v2 vale <b>9,873 USD/mes</b> (IC 95 % [9,782, 9,950]); <b>+788 USD/mes sobre v0</b> (IC [513, 1,115]) con el mismo costo de operación (≈ 25 USD/mes, ≈ 0.0025 USD por búsqueda). Cada punto de top-3 vale ≈ 82 USD/mes.</li>
+  <li><b>Sensibilidad:</b> ningún supuesto ±50 % vuelve negativo el valor; aun con la búsqueda manual a la mitad, 5,928 USD/mes.</li>
+</ul>
+
+<h2 id="curso">14. Mapa con lo visto en el curso</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Tema del curso</th><th>Dónde aparece en SeñaBusca</th></tr></thead>
+<tbody>
+<tr><td>Clasificación, softmax y entropía cruzada</td><td>50 clases, salida softmax, pérdida con label smoothing</td></tr>
+<tr><td>Modelos clásicos como línea base</td><td>Regresión logística y k-NN sobre estadísticos</td></tr>
+<tr><td>Redes recurrentes / LSTM</td><td>v0: LSTM bidireccional de 2 capas, many-to-one</td></tr>
+<tr><td>Atención y Transformers</td><td>v1/v2: encoder con token [CLS], posiciones aprendidas, 4 cabezas</td></tr>
+<tr><td>Transfer learning y fine-tuning</td><td>Preentrenamiento propio con 450 señas; congelado vs. fine-tuning con lr diferenciado</td></tr>
+<tr><td>Regularización</td><td>Dropout, weight decay, aumentos de datos, early stopping, label smoothing</td></tr>
+<tr><td>Optimización</td><td>AdamW, warmup + coseno, recorte de gradiente</td></tr>
+<tr><td>Sobreajuste y curvas de aprendizaje</td><td>LSTM 0.999 vs 0.689; curva con 25/50/75/100 % de personas</td></tr>
+<tr><td>Evaluación honesta</td><td>Split por persona, selección en validación, 3 semillas, IC por bootstrap</td></tr>
+<tr><td>Explicabilidad</td><td>Oclusión, saliencia por gradiente, mapas de atención</td></tr>
+<tr><td>Despliegue</td><td>Inferencia en CPU (≈ 2 ms), mismo preprocesamiento en entrenamiento y producción</td></tr>
+</tbody></table></div>
+
+<!-- ======================================================== PARTE 2 -->
+<h2 id="guion">15. Guion de 5 minutos</h2>
+<p>8 diapositivas, unos 2 minutos y medio cada uno. El reparto no aparece en las diapositivas. Esteban abre con el problema y los datos y cierra con el valor; Nicolás explica el modelo, el transfer learning y las iteraciones. Los dos deben poder contestar cualquier pregunta (secciones 1–14).</p>
+<div class="legend"><span class="pill est">Esteban ≈ 2:10</span><span class="pill nico">Nicolás ≈ 2:40</span><span class="mono">total ≈ 4:50</span></div>
+
+<div class="slide est"><div class="head"><h3>1 · SeñaBusca (portada)</h3><span><span class="pill est">Esteban</span> <span class="time">0:00–0:15</span></span></div>
+<p class="say">"Buenos días. Somos Esteban y Nicolás y les presentamos SeñaBusca: un diccionario inverso de lengua de señas americana. Haces la seña frente a la cámara y un modelo de deep learning que entrenamos nosotros te dice qué significa."</p></div>
+
+<div class="slide est"><div class="head"><h3>2 · El problema</h3><span><span class="pill est">Esteban</span> <span class="time">0:15–0:50</span></span></div>
+<p class="say">"Cuando aprendes ASL y ves una seña que no conoces, los diccionarios no te ayudan: van de la palabra a la seña, no al revés. Lo medimos: buscando a mano en Handspeak y SignASL tardamos una mediana de 274 segundos por seña y no encontramos ninguna de tres. Con SeñaBusca resolvimos 6 de 6, todas en la primera opción, en unos 10 segundos. El usuario es el estudiante, y quien paga es la institución que enseña ASL."</p></div>
+
+<div class="slide est"><div class="head"><h3>3 · De video a tensor</h3><span><span class="pill est">Esteban</span> <span class="time">0:50–1:35</span></span></div>
+<p class="say">"Usamos ASL Citizen, de Microsoft: videos de webcam de 52 personas sordas. Tomamos 50 señas cotidianas y evaluamos siempre con personas que el modelo nunca vio. No le damos píxeles al modelo: con MediaPipe extraemos 53 puntos por cuadro, del torso, la cara y las dos manos. Los centramos y escalamos por los hombros, para que no importe dónde estás ni a qué distancia, y remuestreamos a 64 cuadros. Cada seña queda como un tensor de 64 por 161. Así el modelo ve directamente lo que define una seña: la forma y el movimiento de las manos respecto al cuerpo, y el video nunca sale del navegador."</p>
+<p class="tip">Si preguntan por qué no píxeles: pocos datos por seña, invariancia al fondo y la luz, privacidad (sección 4).</p></div>
+
+<div class="slide nico"><div class="head"><h3>4 · El modelo: Transformer encoder</h3><span><span class="pill nico">Nicolás</span> <span class="time">1:35–2:30</span></span></div>
+<p class="say">"El núcleo es un Transformer encoder, como el de BERT. Cada cuadro se proyecta a 192 dimensiones; agregamos un token CLS y embeddings posicionales, porque la atención por sí sola no conoce el orden. Luego hay 4 bloques de autoatención con 4 cabezas. La autoatención deja que cada cuadro mire directamente a cualquier otro: el inicio y el final de la seña, o el momento en que la mano toca la cara. Primero probamos una LSTM bidireccional, que tiene que pasar esa información paso a paso, y sobreajustaba: 99.9 % en entrenamiento y 69 % en prueba. El Transformer llega a 89.5 % con un tamaño parecido. La salida del CLS va a una softmax de 50 clases; mostramos las 3 más probables y, si su probabilidad sumada es baja, la app dice 'no estoy seguro'."</p></div>
+
+<div class="slide nico"><div class="head"><h3>5 · Transfer learning</h3><span><span class="pill nico">Nicolás</span> <span class="time">2:30–3:15</span></span></div>
+<p class="say">"Para el transfer learning no usamos un modelo ajeno: preentrenamos nuestro propio Transformer con 450 señas distintas de ASL, solo con personas de entrenamiento, y luego lo ajustamos a las 50 con una tasa de aprendizaje cinco veces menor en el backbone, para no borrar lo aprendido. Comparado con el mismo Transformer desde cero, con todos los datos gana poco, pero con solo 9 personas de entrenamiento pasa de 77.5 % a 92.6 % de top-3. Esa eficiencia en datos es lo que nos permitiría crecer el vocabulario."</p></div>
+
+<div class="slide nico"><div class="head"><h3>6 · Iteraciones</h3><span><span class="pill nico">Nicolás</span> <span class="time">3:15–4:00</span></span></div>
+<p class="say">"Así avanzó el top-3 en personas no vistas: 79.9 % sin deep learning, 86 % con la LSTM, 93 % con aumentos de datos, 96.6 % con el Transformer y 97.2 % con transfer learning. El último paso salió de probar la app como una webcam real: el modelo fallaba cuando la grabación cortaba la seña o la cámara estaba muy cerca. Entrenamos de nuevo con aumentos que imitan esas fallas y la versión final llega a 98.1 %, y es la que mejor resiste esos casos."</p></div>
+
+<div class="slide est"><div class="head"><h3>7 · Del modelo al valor</h3><span><span class="pill est">Esteban</span> <span class="time">4:00–4:35</span></span></div>
+<p class="say">"Traducimos esto a negocio con un modelo de valor: el tiempo ahorrado por búsqueda, contando errores y búsquedas fallidas, con supuestos que medimos en una prueba piloto. Para 500 estudiantes la versión final ahorra 9,873 dólares al mes, 788 más que la LSTM, con el mismo costo de operación: 2 milisegundos por seña en CPU y menos de un centavo por búsqueda. El umbral de confianza lo elegimos maximizando ese valor, no la precisión."</p></div>
+
+<div class="slide nico"><div class="head"><h3>8 · Conclusiones</h3><span><span class="pill nico">Nicolás</span> <span class="time">4:35–4:50</span></span></div>
+<p class="say">"En resumen: la atención y el transfer learning fueron los saltos del modelo, y probar el producto nos mostró problemas que el notebook no veía. El siguiente paso es más señas y más usuarios. Gracias, con gusto respondemos preguntas."</p></div>
+
+<h2 id="preguntas">16. Preguntas probables (con respuesta corta)</h2>
+<div class="qa-item"><p class="qa-q">¿Por qué Transformer y no LSTM?</p><p class="qa-a">La LSTM sobreajusta (0.999 vs 0.689) y la información entre cuadros lejanos pasa por toda la cadena recurrente. La atención conecta cualquier par de cuadros en una capa; con 65 posiciones su costo cuadrático es trivial. Pasar a Transformer explica 583 de los 788 USD/mes de diferencia entre v2 y v0.</p></div>
+<div class="qa-item"><p class="qa-q">¿Para qué el token [CLS] y las posiciones?</p><p class="qa-a">El [CLS] es un resumen aprendido de toda la secuencia (en vez de promediar, la red decide qué cuadros pesan). Las posiciones son necesarias porque la autoatención es invariante al orden: sin ellas, una seña y su movimiento inverso serían iguales.</p></div>
+<div class="qa-item"><p class="qa-q">¿Cómo compararon el transfer learning con el modelo base?</p><p class="qa-a">Misma arquitectura, mismo entrenamiento: it2 desde cero 0.895 / 0.966; it5 con fine-tuning 0.899 / 0.972; con 9 personas, 0.775 vs 0.926 de top-3. El preentrenamiento usa otras 450 señas y solo personas de entrenamiento: no hay fuga.</p></div>
+<div class="qa-item"><p class="qa-q">¿Por qué congelado vs. fine-tuning?</p><p class="qa-a">Congelado (solo la cabeza) prueba si las features preentrenadas ya sirven (0.886). Fine-tuning con lr 5× menor en el backbone las adapta sin destruirlas (0.899) y es mejor con pocos datos.</p></div>
+<div class="qa-item"><p class="qa-q">¿Qué hace el label smoothing y por qué?</p><p class="qa-a">Cambia el objetivo one-hot por 0.9 para la clase correcta y reparte 0.1 entre el resto. Evita logits extremos y sobreconfianza; la app usa las probabilidades para decidir si dice "no estoy seguro".</p></div>
+<div class="qa-item"><p class="qa-q">¿Cómo evitan el sobreajuste?</p><p class="qa-a">Aumentos de datos (el cambio más rentable), dropout, weight decay, label smoothing y early stopping con validación. El Transformer chico rinde igual: el límite son los datos.</p></div>
+<div class="qa-item"><p class="qa-q">¿Hay fuga de información?</p><p class="qa-a">No. Split oficial por persona; el preentrenamiento usa otras señas y solo personas de entrenamiento; el umbral y el epoch se eligen en validación; prueba se evalúa una vez.</p></div>
+<div class="qa-item"><p class="qa-q">¿Por qué la app acierta menos que el notebook?</p><p class="qa-a">El notebook usa segmentos perfectos. En vivo se suman la segmentación automática y la detección del navegador: ≈ 5 puntos menos (93 % de top-3). Por eso lo medimos con la cámara simulada y corregimos la segmentación.</p></div>
+<div class="qa-item"><p class="qa-q">¿Qué es it7 y no es trampa con prueba?</p><p class="qa-a">Es el fine-tuning de it5 con aumentos que imitan la cámara en vivo. La motivó la prueba del producto, pero se eligió por validación (0.986 de top-3, la mejor), con el mismo criterio que todas.</p></div>
+<div class="qa-item"><p class="qa-q">¿Cómo eligieron el umbral 0.67?</p><p class="qa-a">Maximizando el valor de negocio en validación. Al medir que revisar 3 opciones toma 2.4 s, mostrar 3 opciones conviene más que antes. Costo: detecta 64 % de las señas fuera de vocabulario (antes 87 %).</p></div>
+<div class="qa-item"><p class="qa-q">¿Qué mira el modelo? (explicabilidad)</p><p class="qa-a">Oclusión: sin muñecas el top-3 cae a 0.49, sin cara a 0.58, sin mano derecha a 0.59. Usa la trayectoria de las manos y su ubicación respecto al cuerpo. La atención del [CLS] se concentra en el centro de la seña.</p></div>
+<div class="qa-item"><p class="qa-q">¿Qué pasa con una persona zurda?</p><p class="qa-a">El aumento de espejo intercambia manos y lados del cuerpo: con la seña reflejada el top-3 no cambia (0.981).</p></div>
+<div class="qa-item"><p class="qa-q">¿Y si hacen una seña que no está entre las 50?</p><p class="qa-a">Medimos ese caso con videos de las 450 señas extra: la app dice "no estoy seguro" en el 64 % de ellas. Es el trade-off del umbral elegido por valor.</p></div>
+<div class="qa-item"><p class="qa-q">¿Los supuestos del valor son reales?</p><p class="qa-a">Tres se midieron en una prueba piloto con una persona (lo decimos así); p_manual sigue estimado y conservador. Ningún supuesto ±50 % vuelve negativo el valor.</p></div>
+
+<h2 id="numeros">17. Números para memorizar</h2>
+<div class="stats">
+  <div class="stat"><b>98.1 %</b><span>top-3 de v2 en prueba (90.6 % top-1)</span></div>
+  <div class="stat"><b>93.0 %</b><span>top-3 con cámara en tiempo real</span></div>
+  <div class="stat"><b>64 × 161</b><span>tensor de entrada por seña</span></div>
+  <div class="stat"><b>1.83 M</b><span>parámetros del Transformer</span></div>
+  <div class="stat"><b>0.775 → 0.926</b><span>top-3 con 9 personas: desde cero vs TL</span></div>
+  <div class="stat"><b>9,873</b><span>USD/mes de valor neto de v2</span></div>
+  <div class="stat"><b>+788</b><span>USD/mes de v2 sobre v0</span></div>
+  <div class="stat"><b>≈ 2 ms</b><span>por seña en CPU</span></div>
+</div>
+<footer class="end">Fuentes: <code>reports/tablas/</code>, <code>asl/models.py</code>, <code>scripts/03_entrenar.py</code>, <code>docs/RESULTADOS_PRUEBA_USUARIOS.md</code> y el informe. Cifras al 15 de noviembre de 2026.</footer>
+</main>
+</div>
+</body>
+</html>
