@@ -4,7 +4,7 @@
     "v0": {
       "archivo": "it0_lstm_base_s2",
       "desc": "v0 · LSTM desde cero",
-      "umbral": 0.98,
+      "umbral": 0.96,
       "iteracion": "it0_lstm_base",
       "seed": 2
     },
@@ -18,7 +18,7 @@
     "v2": {
       "archivo": "it7_tl_tf_webcam_s1",
       "desc": "v2 · Transformer con transfer learning",
-      "umbral": 0.83,
+      "umbral": 0.67,
       "iteracion": "it7_tl_tf_webcam",
       "seed": 1
     }

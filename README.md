@@ -14,16 +14,19 @@ Ninguna parte del sistema usa un LLM.
 
 | Versión | Modelo | Top-1 | Top-3 | Seg/búsqueda* | Valor neto USD/mes* [IC 95 %] | Latencia CPU |
 |---|---|---|---|---|---|---|
-| — | Regresión logística (sin DL) | 0.617 | 0.799 | — | 5,607 | 0.1 ms |
-| v0 | LSTM bidireccional desde cero | 0.656 | 0.862 | 99 s | 6,169 [5,891, 6,390] | 2.1 ms |
-| v1 | Transformer desde cero + aumentos | 0.883 | 0.969 | 85 s | 6,637 [6,541, 6,739] | 1.7 ms |
-| **v2** | **Transformer preentrenado en 450 señas + fine-tuning + aumentos de cámara (it7)** | **0.906** | **0.981** | **80 s** | **6,795 [6,723, 6,860]** | **1.8 ms** |
+| — | Regresión logística (sin DL) | 0.617 | 0.799 | — | 8,446 | 0.1 ms |
+| v0 | LSTM bidireccional desde cero | 0.656 | 0.862 | 106 s | 9,085 [8,703, 9,386] | 2.1 ms |
+| v1 | Transformer desde cero + aumentos | 0.883 | 0.969 | 88 s | 9,668 [9,546, 9,793] | 1.7 ms |
+| **v2** | **Transformer preentrenado en 450 señas + fine-tuning + aumentos de cámara (it7)** | **0.906** | **0.981** | **82 s** | **9,873 [9,782, 9,950]** | **1.8 ms** |
 
-\* Modelo de valor (`asl/valor.py`): 500 estudiantes × 20 búsquedas/mes, búsqueda manual = 285 s
-equivalentes, 15 % de búsquedas fuera del vocabulario (medidas con videos reales de otras señas),
-umbral de confianza elegido en validación. v2 − v0 = +626 USD/mes (IC 95 % [442, 852]). Latencia
+\* Modelo de valor (`asl/valor.py`): 500 estudiantes × 20 búsquedas/mes, búsqueda manual = 379 s
+equivalentes (274 s medidos en la prueba piloto + el costo de las búsquedas que fallan), 15 % de búsquedas fuera del vocabulario (medidas con videos reales de otras señas),
+umbral de confianza elegido en validación. v2 − v0 = +788 USD/mes (IC 95 % [513, 1,115]). Latencia
 medida en CPU (2 hilos, batch 1) con `scripts/10_latencia.py` en una laptop Intel.
 
+* **Prueba piloto con usuario** (`/?prueba=usuarios`, `docs/RESULTADOS_PRUEBA_USUARIOS.md`): buscando a
+  mano en diccionarios en línea, mediana de 274 s y 0 de 3 señas encontradas; con SeñaBusca, 6 de 6 en la
+  primera opción en una mediana de 10 s. Con eso se midieron `t_manual`, `t_rev3` y `t_grabar`.
 * **Prueba con cámara simulada en tiempo real** (`scripts/13_prueba_camara_simulada.py`): los 616
   videos de prueba encadenados como una webcam para Chromium. v2 acierta el 84.4 % en la primera
   opción y el 93.0 % en las 3 mostradas (v1 90.3 %, v0 81.5 % de top-3). La primera corrida mostró que

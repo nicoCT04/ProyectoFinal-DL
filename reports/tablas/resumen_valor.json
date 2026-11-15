@@ -3,7 +3,7 @@
     "v0": {
       "it": "it0_lstm_base",
       "seed": 2,
-      "tau": 0.98
+      "tau": 0.96
     },
     "v1": {
       "it": "it2_tf_aug",
@@ -13,46 +13,46 @@
     "v2": {
       "it": "it7_tl_tf_webcam",
       "seed": 1,
-      "tau": 0.8300000000000001
+      "tau": 0.67
     }
   },
   "desplegado": "v2",
   "ic95_diferencias_valor": {
     "v1_menos_v0": [
-      255.99807269022787,
-      724.9735498659448
+      300.9402011592447,
+      930.7403187950222
     ],
     "v2_menos_v1": [
-      71.19917173278398,
-      242.0083325527516
+      65.34431853055744,
+      335.9419958163177
     ],
     "v2_menos_v0": [
-      441.8634613004599,
-      851.9788366617989
+      513.0532655006291,
+      1114.640918353931
     ]
   },
   "escenarios": {
     "v0": {
-      "base": 6168.984201129545,
-      "pesimista": -14.048836580087226,
-      "umbral_pesimista": 1.0
+      "base": 9084.927334032003,
+      "pesimista": 525.0394206184419,
+      "umbral_pesimista": 0.99
     },
     "v1": {
-      "base": 6636.9609719680875,
-      "pesimista": 207.6436366971862,
+      "base": 9668.196012690985,
+      "pesimista": 899.1836019603221,
       "umbral_pesimista": 0.92
     },
     "v2": {
-      "base": 6795.401332086094,
-      "pesimista": 319.15476689312317,
-      "umbral_pesimista": 0.91
+      "base": 9873.42500171242,
+      "pesimista": 1031.438357481967,
+      "umbral_pesimista": 0.87
     }
   },
   "supuestos": {
-    "t_grabar": 8.0,
-    "t_rev3": 15.0,
+    "t_grabar": 7.0,
+    "t_rev3": 2.4,
     "t_rev10": 45.0,
-    "t_manual": 180.0,
+    "t_manual": 274.0,
     "p_manual": 0.65,
     "p_engano": 0.3,
     "p_engano_aviso": 0.05,
@@ -64,7 +64,7 @@
     "costo_fijo_mes": 25.0,
     "costo_pred": 2e-05
   },
-  "costo_manual_seg": 285.0,
+  "costo_manual_seg": 379.0,
   "preentreno_min": {
     "pre_lstm": 4.453332532776727,
     "pre_tf": 4.328942765129937

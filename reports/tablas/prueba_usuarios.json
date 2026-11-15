@@ -1,0 +1,45 @@
+{
+  "participantes": 2,
+  "ensayos_manual": 3,
+  "ensayos_app": 6,
+  "manual": {
+    "t_mediana_s": 274.4608000000045,
+    "t_iqr_s": [
+      253.6651000000015,
+      287.23040000000225
+    ],
+    "encontrada": 0.0
+  },
+  "app": {
+    "t_total_mediana_s": 10.154700000002979,
+    "t_total_iqr_s": [
+      8.146349999999627,
+      11.74477499999851
+    ],
+    "resuelta": 1.0,
+    "intentos_promedio": 2.5,
+    "t_primer_resultado_mediana_s": 2.292849999997765,
+    "t_eleccion_mediana_s": 2.351199999999255,
+    "t_eleccion_modo_seguro_mediana_s": 2.351199999999255,
+    "rank_elegido": {
+      "0.0": 6
+    },
+    "eligio_opcion_equivocada": 0
+  },
+  "supuestos_medidos": {
+    "t_manual": 274.4608000000045,
+    "p_manual": 0.0,
+    "t_rev3": 2.351199999999255,
+    "t_grabar": 7.023949999999255
+  },
+  "encuesta": {
+    "n": 1,
+    "facil_manual": 1.0,
+    "facil_app": 5.0,
+    "confianza": 5.0,
+    "usaria": 4.0,
+    "pagaria_mediana_usd": 0.0,
+    "pagaria_fraccion": 0.0
+  },
+  "comentarios": []
+}

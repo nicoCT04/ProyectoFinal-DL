@@ -29,12 +29,12 @@ import numpy as np
 @dataclass(frozen=True)
 class Supuestos:
     # --- tiempos de interacción (s)
-    t_grabar: float = 8.0          # levantar manos, hacer la seña, bajar manos
-    t_rev3: float = 15.0           # mirar 3 videos de ejemplo y elegir
+    t_grabar: float = 7.0          # medido (prueba piloto): hacer la seña hasta el último resultado, con reintentos
+    t_rev3: float = 2.4            # medido (prueba piloto): mediana de ms_hasta_elegir en modo seguro
     t_rev10: float = 45.0          # revisar una lista de 10 opciones
-    t_manual: float = 180.0        # búsqueda manual por rasgos en un diccionario en línea
+    t_manual: float = 274.0        # medido (prueba piloto): mediana de la búsqueda en un diccionario en línea
     # --- probabilidades de comportamiento
-    p_manual: float = 0.65         # probabilidad de que la búsqueda manual encuentre la seña
+    p_manual: float = 0.65         # estimación conservadora (en la prueba piloto se encontraron 0 de 3)
     p_engano: float = 0.30         # aceptar una opción equivocada mostrada "con seguridad"
     p_engano_aviso: float = 0.05   # ídem cuando la app avisa que no está segura
     # --- costos de error (s equivalentes)

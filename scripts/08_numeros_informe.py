@@ -77,11 +77,11 @@ def main():
     # ---------------- tabla de supuestos
     S = SUPUESTOS_BASE
     N["tabla_supuestos"] = [
-        ["t_grabar", f"{S.t_grabar:.0f} s", "Estimación: levantar manos, hacer la seña (≈ 2–3 s en el dataset) y bajarlas; incluye reintentos."],
-        ["t_rev3", f"{S.t_rev3:.0f} s", "Estimación: revisar 3 tarjetas con esqueleto animado (≈ 5 s c/u). Se mide en la app (ms_hasta_elegir)."],
+        ["t_grabar", f"{S.t_grabar:.1f} s", "Medido en la prueba piloto (1 persona, 6 búsquedas): mediana desde «Listo» hasta el último resultado, con 2.5 intentos en promedio."],
+        ["t_rev3", f"{S.t_rev3:.1f} s", "Medido en la prueba piloto: mediana de ms_hasta_elegir en modo seguro (la estimación previa era 15 s)."],
         ["t_rev10", f"{S.t_rev10:.0f} s", "Estimación: lista de 10 opciones (≈ 4–5 s c/u)."],
-        ["t_manual", f"{S.t_manual:.0f} s", "Estimación: búsqueda por rasgos en un diccionario en línea (navegar forma de mano/ubicación y ver varios videos). Medir en la prueba de usuarios."],
-        ["p_manual", pct(S.p_manual, 0), "Estimación conservadora: la búsqueda por rasgos falla con frecuencia [2], [3]."],
+        ["t_manual", f"{S.t_manual:.0f} s", "Medido en la prueba piloto: mediana de 3 búsquedas en diccionarios en línea (tope de 5 min; la estimación previa era 180 s)."],
+        ["p_manual", pct(S.p_manual, 0), "Estimación conservadora [2], [3]; en la prueba piloto se encontraron 0 de 3, así que no se usa el valor medido (muestra muy pequeña)."],
         ["c_no_resuelta", f"{S.c_no_resuelta:.0f} s", "Preguntar al docente o retrasar la tarea; equivalente a 5 min."],
         ["p_engano / p_engano_aviso", f"{pct(S.p_engano, 0)} / {pct(S.p_engano_aviso, 0)}", "Sesgo de automatización: se confía en la sugerencia mostrada con seguridad; el aviso explícito lo reduce."],
         ["c_error", f"{S.c_error:.0f} s", "Aprender o usar mal una seña y corregirlo después (10 min)."],
@@ -230,6 +230,21 @@ def main():
             f"({it.loc['it7_tl_tf_webcam','Top-1 test']} / {it.loc['it7_tl_tf_webcam','Top-3 test']} de top-1 / top-3) y es más robusta: "
             f"{rb.loc['seña cortada: último 60 %', b]:.3f}, {rb.loc['hombros sin detectar', b]:.3f} y {rb.loc['cámara 1.4× más cerca', b]:.3f} "
             "en esos mismos casos. Como también es la mejor en validación, el criterio de selección la eligió como v2.")
+    if (TAB / "prueba_usuarios.json").exists():
+        pu = json.loads((TAB / "prueba_usuarios.json").read_text())
+        m_, a_, e_ = pu["manual"], pu["app"], pu.get("encuesta", {})
+        N["frase_usuarios"] = (
+            f"Prueba piloto con un integrante del equipo ({pu['participantes']} sesiones) usando la sesión guiada de la app (/?prueba=usuarios; "
+            f"docs/RESULTADOS_PRUEBA_USUARIOS.md). Buscando a mano en diccionarios en línea (Handspeak, SignASL, Lifeprint) señas que no "
+            f"conocía, tardó una mediana de {m_['t_mediana_s']:.0f} s y encontró {m_['encontrada'] * pu['ensayos_manual']:.0f} de "
+            f"{pu['ensayos_manual']}; con SeñaBusca resolvió {a_['resuelta'] * pu['ensayos_app']:.0f} de {pu['ensayos_app']} búsquedas, "
+            f"siempre en la primera opción, en una mediana de {a_['t_total_mediana_s']:.0f} s ({a_['intentos_promedio']:.1f} intentos de "
+            f"grabación en promedio). Calificó la facilidad con {e_.get('facil_manual', float('nan')):.0f}/5 a mano y "
+            f"{e_.get('facil_app', float('nan')):.0f}/5 con la app. Con estos datos se reemplazaron t_manual, t_rev3 y t_grabar; p_manual se "
+            "mantiene en la estimación conservadora porque 3 búsquedas no bastan para estimarla. Es una sola persona: la medición con más "
+            "estudiantes es el siguiente paso, y el análisis de sensibilidad muestra que la conclusión no depende de estos valores. "
+            "No pagaría por la app como estudiante, lo que confirma que el cliente es la institución (curso o programa de ASL) que "
+            "valora el tiempo de sus estudiantes, no el estudiante individual.")
     if (TAB / "prueba_camara_simulada.json").exists():
         cs = json.loads((TAB / "prueba_camara_simulada.json").read_text())
         mm, aj = cs["modelos"], cs["ajuste_segmentacion_60_videos"]
