@@ -1,0 +1,48 @@
+{
+  "top1": 0.9058441558441559,
+  "n_test": 616,
+  "n_errores": 58,
+  "umbral": 0.67,
+  "top1_logistica": 0.6168831168831169,
+  "costo_ms": {
+    "inferencia_ms": 0.8356457983609289,
+    "ig_ms": 99.13425415288657,
+    "oclusion_ms": 27.932485449127853
+  },
+  "segundos_oclusion_total": 11.02715277671814,
+  "auc_borrado": {
+    "IG (reposo)": 0.18038888275623322,
+    "IG (ceros)": 0.24656561017036438,
+    "IG (media)": 0.261508584022522,
+    "Oclusión": 0.350786030292511,
+    "Azar": 0.5515555143356323
+  },
+  "spearman_ig_oclusion_mediana": 0.4783724340175953,
+  "spearman_cordura_mediana": 0.011180351906158358,
+  "cuota_global": {
+    "cara": 0.030642475932836533,
+    "brazos": 0.09748852998018265,
+    "mano no dominante": 0.17534787952899933,
+    "mano dominante": 0.5307676792144775,
+    "presencia de mano": 0.1657535284757614
+  },
+  "cuota_logistica": {
+    "cara": 0.07698935270309448,
+    "brazos": 0.1445872038602829,
+    "mano no dominante": 0.37127209290281515,
+    "mano dominante": 0.39050942078813333,
+    "presencia de mano": 0.01664186269044876
+  },
+  "pct_mano_izq_dominante": 0.4155844155844156,
+  "oov_aceptadas": 0.1676756558429646,
+  "n_oov": 5451,
+  "pares_confusion": {
+    "PLEASE → HAPPY": 4,
+    "GOOD → THANKYOU": 4,
+    "THANKYOU → GOOD": 4,
+    "BAD → GOOD": 3,
+    "SISTER → BROTHER": 3,
+    "HOT → BAD": 2
+  },
+  "errores_con_conf_sobre_umbral": 0.22413793103448276
+}

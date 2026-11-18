@@ -1,0 +1,6 @@
+metodo,auc_borrado,ms_por_instancia_cpu
+IG (reposo),0.18,99.1
+IG (ceros),0.247,99.1
+IG (media),0.262,99.1
+Oclusión,0.351,27.9
+Azar,0.552,0.0

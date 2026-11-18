@@ -1,0 +1,6 @@
+grupo,n,top1,cuota_cara,cuota_brazos,cuota_mano_dominante,cuota_mano_no_dominante,cuota_presencia,cuota_bordes_16_cuadros
+todas,616,0.906,0.031,0.097,0.531,0.175,0.166,0.084
+aciertos,558,1.0,0.03,0.096,0.529,0.177,0.167,0.082
+errores,58,0.0,0.037,0.112,0.546,0.156,0.149,0.11
+mano der. dominante,360,0.911,0.031,0.095,0.547,0.167,0.16,0.09
+mano izq. dominante,256,0.898,0.03,0.101,0.508,0.187,0.174,0.076

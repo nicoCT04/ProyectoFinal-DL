@@ -1,0 +1,7 @@
+caso,persona,real,real_es,pred,pred_es,confianza,top3,acepta_umbral,cuota cara,cuota brazos,cuota mano izq.,cuota mano der.,cuota presencia de mano,cuadro_pico,evidencia_neta_pred,evidencia_neta_real,parte_que_mas_separa
+"Acierto, alta confianza",P47,STUDENT,estudiante,STUDENT,estudiante,0.986,STUDENT 0.99 · LEARN 0.00 · TEACHER 0.00,True,0.04,0.11,0.28,0.38,0.19,31,,,
+Error con más confianza,P35,HOT,caliente,BAD,malo,0.977,BAD 0.98 · HOT 0.00 · KNOW 0.00,True,0.05,0.11,0.0,0.66,0.18,20,3.24,3.89,brazos
+Error del par más confundido,P48,GOOD,bueno,THANKYOU,gracias,0.813,THANKYOU 0.81 · GOOD 0.06 · HOT 0.02,True,0.03,0.11,0.1,0.69,0.08,46,8.49,6.77,mano der.
+Cerca del umbral (0.67),P17,HAPPY,feliz,GOOD,bueno,0.669,GOOD 0.67 · HAPPY 0.25 · THANKYOU 0.03,False,0.04,0.16,0.64,0.0,0.16,22,8.32,5.39,presencia de mano
+Subgrupo: mano izq. dominante,P6,WHERE,¿dónde?,WHERE,¿dónde?,0.919,WHERE 0.92 · NO 0.03 · BOOK 0.00,True,0.03,0.08,0.75,0.0,0.14,49,,,
+Fuera del vocabulario (aceptada),P47,SSHH,,WHO,¿quién?,0.975,WHO 0.98 · SISTER 0.00 · TOMORROW 0.00,True,0.01,0.05,0.29,0.61,0.05,50,,,

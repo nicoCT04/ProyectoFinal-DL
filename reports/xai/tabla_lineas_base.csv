@@ -1,0 +1,4 @@
+linea_base,segundos,err_completitud_max,prob_max_en_base,cuota cara,cuota brazos,cuota mano izq.,cuota mano der.,cuota presencia de mano
+reposo,65.5,0.00017023086547851562,0.6466120481491089,0.031,0.097,0.309,0.397,0.166
+ceros,64.0,5.7220458984375e-06,0.5336679816246033,0.266,0.23,0.177,0.207,0.121
+media,63.6,5.245208740234375e-06,0.18122845888137817,0.071,0.173,0.279,0.409,0.067

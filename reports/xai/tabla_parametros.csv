@@ -1,0 +1,10 @@
+parametro,valor
+Modelo,"v2 = it7_tl_tf_webcam_s1 (despliegue.json), sin reentrenar; umbral 0.67"
+Datos,prueba: 616 videos de 11 personas no vistas; OOV: 5451 videos de 450 señas
+Método principal,Integrated Gradients (captum 0.9) sobre el logit de la clase predicha
+Línea base,reposo: misma pose promediada en el tiempo y manos no detectadas (0 y bandera 0)
+Pasos de integración,"64, regla de Gauss-Legendre"
+Agregación,suma con signo por parte del cuerpo (5 grupos) y por cuadro (64)
+Alternativa,"oclusión de 4 partes × 8 ventanas de 8 cuadros, reemplazo por la línea base"
+Fidelidad,"curva de borrado de los 32 bloques, área bajo la curva (menor = mejor)"
+Semilla y entorno,"SEED = 23197; CPU, 1 hilo, algoritmos deterministas de PyTorch"
