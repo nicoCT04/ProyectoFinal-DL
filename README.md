@@ -76,6 +76,7 @@ ProyectoFinal-DL/
 │   ├── server.py             # FastAPI: /api/predict, /api/predict_video, /api/feedback, /api/info
 │   └── static/               # interfaz web (MediaPipe Tasks en el navegador)
 ├── notebook/proyecto_final.ipynb       # EDA, resultados, modelo de valor, explicabilidad (ejecutado)
+├── xai/                      # Laboratorio 10: Integrated Gradients, oclusión, notebook lab10.ipynb
 ├── reports/
 │   ├── figuras/  tablas/  runs/        # resultados (métricas por corrida, curvas)
 │   └── Informe_ProyectoFinal_ASL.docx  # trabajo escrito
@@ -121,6 +122,34 @@ bash scripts/run_all.sh        # ≈ 2–3 h en Apple M4 Pro (descarga ~10 GB pa
 
 El orden y cada paso están en `scripts/run_all.sh`. Las semillas están fijas. El notebook
 `notebook/proyecto_final.ipynb` carga los resultados (o re-entrena con `ENTRENAR = True`).
+
+## Laboratorio 10 — Explicabilidad (XAI)
+
+Explicaciones del modelo desplegado (**v2**, `it7_tl_tf_webcam_s1`) **sin reentrenarlo**, con
+**Integrated Gradients** (captum) como método principal y oclusión por bloques como alternativa.
+
+| Archivo | Qué hace |
+|---|---|
+| `xai/xai_asl.py` | Funciones: carga del modelo, líneas base, IG, oclusión, curva de borrado, prueba de cordura |
+| `xai/generar_xai.py` | Regenera **todas** las figuras y tablas del informe en `reports/xai/` |
+| `xai/lab10.ipynb` | Notebook comentado (investigación, selección, implementación, interpretación, discusión) |
+| `xai/informe/build_informe_lab10.js` | Genera el informe `.docx` a partir de `reports/xai/` |
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt                 # incluye captum==0.9.0
+python xai/generar_xai.py                       # ≈ 6 min en Apple M4 Pro; ~50 min en CPUs x86 más lentas -> reports/xai/
+# o, con el notebook (llama a lo mismo y muestra los resultados):
+cd xai && jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 lab10.ipynb
+```
+
+* **Reproducibilidad:** `SEED = 23197`, CPU con 1 hilo y `torch.use_deterministic_algorithms(True)`; dos
+  corridas producen el mismo `reports/xai/resumen.json` (salvo los tiempos medidos).
+* **Datos necesarios:** `data/cache/objetivo.npz` y `data/cache/preentreno.npz` (salen de los scripts 01–02;
+  no se versionan por la licencia de ASL Citizen).
+* **Resultados principales:** la mano dominante concentra 53 % de la atribución y la cara 3 %. IG con línea base
+  «reposo» es la explicación más fiel (AUC de borrado 0.18, contra 0.35 de la oclusión y 0.55 al azar) y pasa
+  la prueba de cordura (ρ ≈ 0.01 con pesos aleatorios). Hallazgo: las banderas de presencia de mano reciben 17 %.
 
 ## Datos y licencia
 

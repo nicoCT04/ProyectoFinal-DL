@@ -1,7 +1,7 @@
 """
 Laboratorio 10 — genera TODAS las figuras y tablas de explicabilidad del informe.
 
-    .venv/bin/python xai/generar_xai.py          # ≈ 2–4 min en CPU
+    .venv/bin/python xai/generar_xai.py          # ≈ 6 min en Apple M4 Pro (CPU, 1 hilo)
 
 Salida en reports/xai/ (figuras .png, tablas .csv y resumen.json). Semilla fija (SEED = 23197),
 todo en CPU y con un solo hilo para que los números se regeneren idénticos.
