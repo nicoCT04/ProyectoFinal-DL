@@ -18,6 +18,7 @@ const FIG = path.join(ROOT, "reports", "figuras");
 const OUT = path.join(ROOT, "reports", "Informe_ProyectoFinal_ASL.docx");
 const LOGO = path.join(__dirname, "uvg_logo.png");
 const REPO_URL = "https://github.com/nicoCT04/ProyectoFinal-DL";
+const VIDEO_URL = "https://youtu.be/HbqyY3AJdvc";
 const FECHA = "Guatemala, noviembre de 2026";
 
 // ----------------------------------------------------------------------------- datos
@@ -116,10 +117,11 @@ const cover = [
   C(FECHA),
   new Paragraph({ children: [new PageBreak()] }),
 ];
-const repo = new Paragraph({ spacing: { after: 160 }, children: [
-  new TextRun({ text: "Enlace al repositorio: ", bold: true, font: FONT, size: BODY }),
-  new ExternalHyperlink({ link: REPO_URL, children: [new TextRun({ text: REPO_URL, font: FONT, size: BODY, color: "0563C1", underline: {} })] }),
+const enlace = (etiqueta, url, after) => new Paragraph({ spacing: { after }, children: [
+  new TextRun({ text: etiqueta, bold: true, font: FONT, size: BODY }),
+  new ExternalHyperlink({ link: url, children: [new TextRun({ text: url, font: FONT, size: BODY, color: "0563C1", underline: {} })] }),
 ] });
+const repo = [enlace("Enlace al repositorio: ", REPO_URL, 40), enlace("Video de demostración: ", VIDEO_URL, 160)];
 
 // ----------------------------------------------------------------------------- contenido
 const S = N.supuestos;
@@ -130,6 +132,7 @@ const opt = (n) => (fs.existsSync(path.join(TAB, n)) ? J(n) : null);
 const RV = J("resumen_valor.json");
 const PU = opt("prueba_usuarios.json"), VP = opt("validacion_propia.json"), CS = opt("prueba_camara_simulada.json");
 const EXP = J("explicabilidad_oclusion.json")[dep];
+const PP = csv("por_participante.csv");
 const IDAT = J("iteracion_datos_resumen.json")["it2_tf_aug"];
 const LC = Object.fromEntries(csv("curva_aprendizaje.csv").map(r => [`${r.familia}_${r.frac}`, r]));
 const RB = Object.fromEntries((fs.existsSync(path.join(TAB, "robustez_webcam.csv")) ? csv("robustez_webcam.csv") : []).map(r => [r["perturbación"], r]));
@@ -140,7 +143,7 @@ const V2 = v[dep], V0 = v.v0, V1 = v.v1;
 const dV = (a, b) => fmt(Number(a["Valor neto USD/mes"]) - Number(b["Valor neto USD/mes"]));
 
 const content = [
-  repo,
+  ...repo,
   H1("Resumen"),
   P(`SeñaBusca es un diccionario inverso de lengua de señas americana (ASL): la persona hace una seña frente a la cámara y recibe las tres coincidencias más probables con su significado en español. El núcleo es un modelo de deep learning que diseñamos y entrenamos nosotros sobre secuencias de puntos clave del cuerpo y las manos; no usamos ningún LLM. La versión final (v2, un Transformer preentrenado con 450 señas y ajustado a 50) acierta el ${pct(V2["Top-1 test"])} en la primera opción y el ${pct(V2["Top-3 test"])} dentro de las tres mostradas, con personas que nunca vio. Con nuestro modelo de valor, un programa de 500 estudiantes ahorraría ${fmt(V2["Horas ahorradas/mes"])} horas al mes (≈ ${usd(V2)} USD netos), ${dV(V2, V0)} USD/mes más que la primera versión (LSTM).`),
 
@@ -182,7 +185,7 @@ const content = [
   P(`Costo. Un modelo desde cero tarda de 0.6 a 4 minutos por semilla en una laptop con GPU; el preentrenamiento, ≈ 4 minutos, y el fine-tuning, menos de uno. Lo más caro es extraer los puntos (≈ 1 h de CPU para 15 300 videos). Entrenar cualquier versión en la nube costaría centavos.`),
 
   H1("5. Resultados de iteraciones"),
-  ...TABLA(["Iteración", "Cambio respecto a la anterior", "Top-1 prueba", "Top-3 prueba", "Valor USD/mes"],
+  ...TABLA(["Iteración", "Cambio respecto a la anterior", "Top-1 val.", "Top-1 prueba", "Top-3 prueba", "Valor USD/mes"],
     ["clasico_logreg", "it0_lstm_base", "it1_lstm_aug", "it2_tf_aug", "it4_tl_tf_congelado", "it5_tl_tf_finetune", "it7_tl_tf_webcam"].filter(k => it[k]).map(k => [
       k, {
         clasico_logreg: "Sin deep learning (línea base)",
@@ -192,8 +195,8 @@ const content = [
         it4_tl_tf_congelado: "TL: backbone preentrenado congelado",
         it5_tl_tf_finetune: "TL: fine-tuning completo",
         it7_tl_tf_webcam: "+ aumentos que imitan la cámara en vivo (v2)",
-      }[k], it[k]["Top-1 test"], it[k]["Top-3 test"], it[k]["Valor neto USD/mes (test)"]]),
-    [2.2, 4.3, 1.6, 1.6, 1.6], "Iteraciones (media ± desviación de 3 semillas; prueba = 11 personas no vistas).", 15),
+      }[k], it[k]["Top-1 val"], it[k]["Top-1 test"], it[k]["Top-3 test"], it[k]["Valor neto USD/mes (test)"]]),
+    [2.1, 3.7, 1.5, 1.5, 1.5, 1.5], "Iteraciones (media ± desviación de 3 semillas; validación = 6 personas, prueba = 11 personas no vistas).", 14),
   P(`Qué aprendimos en cada paso. La LSTM sin aumentos sobreajusta: llega a ${it.it0_lstm_base["Top-1 train"]} de top-1 en entrenamiento y ${top(it.it0_lstm_base, "Top-1 test")} en prueba. Los aumentos la suben a ${top(it.it1_lstm_aug, "Top-1 test")}. El salto mayor es pasar a atención: el Transformer llega a ${top(it.it2_tf_aug, "Top-1 test")}, y un Transformer más chico rinde casi igual, señal de que el límite está en los datos y no en la capacidad.`),
   P(`Transfer learning frente al modelo base. Con la misma arquitectura, el fine-tuning (it5) sube un poco sobre el Transformer desde cero (it2) cuando hay 35 personas de entrenamiento, pero su ventaja real es la eficiencia en datos: entrenando con solo 9 personas, el modelo desde cero obtiene ${fmt(LC["tf_0.25"].top3, 3)} de top-3 y el preentrenado ${fmt(LC["tl_0.25"].top3, 3)}. Eso es lo que importa para crecer el vocabulario, donde cada seña nueva tendrá pocas grabaciones.`),
   P(`Dos problemas que solo vimos al probar el producto. (1) Primero extrajimos los puntos en modo IMAGE de MediaPipe, pero el navegador usa modo VIDEO (con seguimiento entre cuadros): el Transformer bajaba de ${fmt(IDAT.A_top1, 3)} a ${fmt(IDAT.B_top1, 3)} de top-1 con datos como los de la app; re-extraer todo en VIDEO lo corrigió (${fmt(IDAT.C_top1, 3)}). (2) Al pasar los videos por la app como una webcam en tiempo real, el modelo sufría con la seña cortada por la segmentación o la cámara muy cerca${RB["seña cortada: último 60 %"] ? ` (top-3 de ${RB["original"]["it5_tl_tf_finetune top3"]} a ${RB["seña cortada: último 60 %"]["it5_tl_tf_finetune top3"]})` : ""}. La iteración it7 repite el fine-tuning con aumentos que imitan esas fallas; en prueba limpia no pierde nada y es más robusta${RB["seña cortada: último 60 %"] ? ` (${RB["seña cortada: último 60 %"]["it7_tl_tf_webcam top3"]} en el mismo caso)` : ""}. Como también fue la mejor en validación, quedó como v2.`),
@@ -208,13 +211,13 @@ const content = [
   ...IMG("app_senabusca.png", 560, "SeñaBusca durante una búsqueda. Se oculta la imagen de la cámara (solo se ven los puntos que detecta MediaPipe): la mano en verde cuenta como seña; a la derecha, el top-3 con su probabilidad y un esqueleto animado de cada opción."),
   P(`La app es un servidor FastAPI con una interfaz web. MediaPipe corre en el navegador; la grabación empieza sola cuando la mano sube por encima de una línea de reposo y termina cuando baja, y solo los puntos viajan al servidor, que responde en ≈ ${fmt(N.latencia_api_ms[dep][0])} ms. Con un servidor de ${fmt(S.costo_fijo_mes)} USD/mes y ${fmt(S.busquedas_mes)} búsquedas, cada búsqueda cuesta ≈ ${((S.costo_fijo_mes + S.costo_pred * S.busquedas_mes) / S.busquedas_mes).toFixed(4)} USD; un solo proceso atiende decenas de búsquedas por segundo. Si la confianza es baja, la app lo dice ("no estoy seguro") y muestra diez opciones: así comunicamos la incertidumbre.`),
   ...IMG("arquitectura.png", 520, "Arquitectura del sistema desplegado."),
-  P(`Validación en el producto. ${CS ? `Pasamos los ${CS.videos} videos de prueba por la app como una webcam en tiempo real: v2 acertó el ${pct(CS.modelos.v2.top1)} en la primera opción y el ${pct(CS.modelos.v2.top3)} en las tres mostradas (v0: ${pct(CS.modelos.v0.top3)}), unos 5 puntos menos que offline. Esa prueba nos mostró que la segmentación descartaba señas cortas; corregirlo subió el top-3 de 48/60 a 58/60. ` : ""}${PU ? `En una prueba piloto con un integrante del equipo (no tenemos más participantes, así que la reportamos como piloto), buscar a mano tomó ${fmt(PU.manual.t_mediana_s)} s y no encontró ninguna de ${PU.ensayos_manual} señas; con SeñaBusca resolvió ${PU.ensayos_app} de ${PU.ensayos_app} en una mediana de ${fmt(PU.app.t_total_mediana_s)} s. ` : ""}${VP ? `En una validación con ${VP.ensayos} señas aprendidas en el momento, la app acertó a la primera el ${pct(VP.top1_primer_intento, 0)} de las veces (${pct(VP.top3_primer_intento, 0)} en el top-3) y el ${pct(VP.top1_ultimo_intento, 0)} al repetir la seña.` : ""}`),
+  P(`Validación en el producto. ${CS ? `Pasamos los ${CS.videos} videos de prueba por la app como una webcam en tiempo real: v2 acertó el ${pct(CS.modelos.v2.top1)} en la primera opción y el ${pct(CS.modelos.v2.top3)} en las tres mostradas (v0: ${pct(CS.modelos.v0.top1)} y ${pct(CS.modelos.v0.top3)}), unos 5 puntos menos que offline. Esa prueba nos mostró que la segmentación descartaba señas cortas; corregirlo subió el top-3 de 48/60 a 58/60. ` : ""}${PU ? `En una prueba piloto con un integrante del equipo (no tenemos más participantes, así que la reportamos como piloto), buscar a mano tomó ${fmt(PU.manual.t_mediana_s)} s y no encontró ninguna de ${PU.ensayos_manual} señas; con SeñaBusca resolvió ${PU.ensayos_app} de ${PU.ensayos_app} en una mediana de ${fmt(PU.app.t_total_mediana_s)} s. ` : ""}${VP ? `En una validación con ${VP.ensayos} señas aprendidas en el momento, la app acertó a la primera el ${pct(VP.top1_primer_intento, 0)} de las veces (${pct(VP.top3_primer_intento, 0)} en el top-3) y el ${pct(VP.top1_ultimo_intento, 0)} al repetir la seña.` : ""}`),
   P(`Monitoreo. La app registra cada predicción y cada respuesta del usuario ("Es esta" con su posición o "Ninguna es"). En producción vigilaríamos la confianza media y la fracción de búsquedas "no estoy seguro" (deriva por cámaras nuevas o señas fuera de vocabulario), la tasa de "Ninguna es" (proxy del top-3 real), la detección de manos y la latencia; las respuestas de los usuarios sirven como datos etiquetados para re-entrenar.`),
 
   H1("7. Explicabilidad, sesgos y riesgos"),
   P(`Ocultamos grupos de puntos para ver de qué depende el modelo: el top-3 cae de ${fmt(EXP.base_top3, 3)} a ${fmt(EXP["sin muñecas (pose)"], 3)} sin las muñecas, ${fmt(EXP["sin cara (nariz, ojos, boca)"], 3)} sin la cara y ${fmt(EXP["sin mano derecha"], 3)} sin la mano derecha. Es decir, usa la trayectoria de las manos y dónde se hacen respecto al cuerpo, que es lo que distingue señas como MOTHER (barbilla) y FATHER (frente). La saliencia por gradiente y la atención del token [CLS] se concentran en el centro de la seña y bajan en los cuadros de reposo. Con la seña reflejada (persona zurda) el modelo no cambia (${fmt(EXP["espejo (zurdo)"], 3)}), gracias al aumento de espejo.`),
   ...IMG("explicabilidad_oclusion.png", 400, "Oclusión por parte del cuerpo y robustez del modelo desplegado (top-3 en prueba)."),
-  P(`Sesgos. El desempeño varía por persona, y el factor que observamos es la detección de manos (luz, cámara, contraste con el fondo); el dataset no publica datos demográficos, así que no podemos atribuirlo a otra variable. El costo de esos errores recae en quien ya tiene peor detección: más búsquedas manuales o aprender un significado equivocado. Los pares que más se confunden comparten forma o ubicación (PLEASE ↔ HAPPY, GOOD ↔ THANKYOU).`),
+  P(`Sesgos. El desempeño varía por persona: entre las ${PP.length} personas de prueba, el top-3 de v2 va de ${fmt(Math.min(...PP.map(r => +r.top3)), 2)} a ${fmt(Math.max(...PP.map(r => +r.top3)), 2)} y el top-1 de ${fmt(Math.min(...PP.map(r => +r.top1)), 2)} a ${fmt(Math.max(...PP.map(r => +r.top1)), 2)}. El factor que observamos es la detección de manos (luz, cámara, contraste con el fondo); el dataset no publica datos demográficos, así que no podemos atribuirlo a otra variable. El costo de esos errores recae en quien ya tiene peor detección: más búsquedas manuales o aprender un significado equivocado. Los pares que más se confunden comparten forma o ubicación (PLEASE ↔ HAPPY, GOOD ↔ THANKYOU).`),
   P(`Riesgos y límites. Reconoce 50 señas aisladas, no frases; no sustituye a un intérprete ni debe usarse en situaciones médicas o legales. Los puntos del cuerpo pueden considerarse biométricos: los registros no se publican y deberían anonimizarse. La licencia del dataset impide un uso comercial: un producto real necesitaría datos propios recolectados con consentimiento.`),
 
   H1("8. Conclusiones"),
@@ -225,7 +228,7 @@ const content = [
 
   H1("9. Repositorio"),
   P("El repositorio incluye preprocesamiento, entrenamiento y evaluación (scripts 01–04), el modelo de valor (asl/valor.py y script 05), explicabilidad (06), la app (app/), las pruebas de la app (scripts 11–14 y la sesión guiada /?prueba=usuarios), el notebook ejecutado y un README con los pasos para instalar, correr la app y reproducir las métricas (scripts/run_all.sh)."),
-  repo,
+  ...repo,
 
   H1("Referencias"),
   P("[1] A. Desai, L. Berger, F. O. Minakov, V. Milan, C. Singh, K. Pumphrey, R. E. Ladner, H. Daumé III, A. X. Lu, N. Caselli y D. Bragg, \"ASL Citizen: A Community-Sourced Dataset for Advancing Isolated Sign Language Recognition,\" arXiv:2304.05934, 2023.", { after: 60 }),
